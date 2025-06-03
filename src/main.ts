@@ -1,23 +1,19 @@
-import './assets/css/main.css'
+import './assets/main.css'
+// Import Swiper styles
+import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css/pagination'
+import 'jsvectormap/dist/jsvectormap.css'
+import 'flatpickr/dist/flatpickr.css'
 
 import { createApp } from 'vue'
-import { createRouter, createWebHistory } from 'vue-router'
-import ui from '@nuxt/ui/vue-plugin'
-
 import App from './App.vue'
+import router from './router'
+import VueApexCharts from 'vue3-apexcharts'
 
 const app = createApp(App)
 
-app.use(createRouter({
-  routes: [
-    { path: '/', component: () => import('./pages/index.vue') },
-    { path: '/accounts', component: () => import('./pages/accounts.vue') },
-    { path: '/templates', component: () => import('./pages/templates.vue') },
-    { path: '/styles', component: () => import('./pages/styles.vue') },
-  ],
-  history: createWebHistory()
-}))
-
-app.use(ui)
+app.use(router)
+app.use(VueApexCharts)
 
 app.mount('#app')
