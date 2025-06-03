@@ -184,7 +184,7 @@ const editForm = ref({
 
 const fetchAccounts = async () => {
   try {
-    const response = await fetch('/dashboard/v1/accounts')
+    const response = await fetch('/dashboard/api/v1/accounts')
     if (!response.ok) {
       throw new Error('Failed to fetch accounts')
     }
@@ -211,7 +211,7 @@ const closeEditModal = () => {
 
 const updateAccount = async () => {
   try {
-    const response = await fetch(`/dashboard/v1/account/${editForm.value.id}`, {
+    const response = await fetch(`/dashboard/api/v1/account/${editForm.value.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -247,7 +247,7 @@ const closeDeleteModal = () => {
 
 const deleteAccount = async () => {
   try {
-    const response = await fetch(`/dashboard/v1/account/${accountToDelete.value}`, {
+    const response = await fetch(`/dashboard/api/v1/account/${accountToDelete.value}`, {
       method: 'DELETE'
     })
 

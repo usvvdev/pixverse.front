@@ -286,7 +286,7 @@ const isDeleting = ref(false)
 
 const fetchStyles = async () => {
   try {
-    const response = await fetch('/dashboard/v1/templates')
+    const response = await fetch('/dashboard/api/v1/templates')
     if (!response.ok) {
       throw new Error('Failed to fetch styles')
     }
@@ -343,7 +343,7 @@ const updateStyle = async () => {
       formData.append('remove_preview', 'true')
     }
 
-    const response = await fetch(`/dashboard/v1/template/${editForm.value.id}`, {
+    const response = await fetch(`/dashboard/api/v1/template/${editForm.value.id}`, {
       method: 'PUT',
       body: formData,
     })
@@ -381,7 +381,7 @@ const closeDeleteModal = () => {
 const deleteStyle = async () => {
   isDeleting.value = true
   try {
-    const response = await fetch(`/dashboard/v1/template/${styleToDelete.value}`, {
+    const response = await fetch(`/dashboard/api/v1/template/${styleToDelete.value}`, {
       method: 'DELETE',
     })
 
