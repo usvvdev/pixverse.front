@@ -23,7 +23,7 @@
 
     <!-- Dropdown Menu -->
     <div v-if="open" :class="menuClass">
-      <slot name="menu">
+      <slot name="Меню">
         <!-- Default menu items -->
         <template v-for="(item, index) in menuItems">
           <router-link
@@ -52,7 +52,6 @@
 
 <script setup>
 import { ref } from 'vue'
-import vClickOutside from './v-click-outside.vue'
 
 const props = defineProps({
   menuItems: {

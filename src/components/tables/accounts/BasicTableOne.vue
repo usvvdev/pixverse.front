@@ -169,6 +169,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 
 const accounts = ref([])
 const showEditModal = ref(false)
@@ -182,17 +183,43 @@ const editForm = ref({
   balance: 0
 })
 
+const userStore = useAuthStore()
+
 const fetchAccounts = async () => {
   try {
-    const response = await fetch('/dashboard/api/v1/accounts')
+    const token = localStorage.getItem('accessToken')
+    const response = await fetch('/dashboard/v1/accounts', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    })
+
     if (!response.ok) {
-      throw new Error('Failed to fetch accounts')
+      if (response.status === 401) {
+        // Токен истёк — пробуем обновить
+        const refreshed = await userStore.refresh()
+
+        if (refreshed) {
+          // Повторяем оригинальный запрос (например, через ту же функцию)
+          return await retryOriginalRequest()
+        } else {
+          // Обновление не удалось — разлогиниваем
+          userStore.logout()
+          router.push('/login')
+        }
+      } else {
+        // Обработка других ошибок
+        console.error('Ошибка запроса:', await response.json())
+      }
     }
+
     accounts.value = await response.json()
   } catch (error) {
     console.error('Error fetching accounts:', error)
   }
 }
+
 
 const openEditModal = (account) => {
   editForm.value = {
@@ -211,16 +238,33 @@ const closeEditModal = () => {
 
 const updateAccount = async () => {
   try {
-    const response = await fetch(`/dashboard/api/v1/account/${editForm.value.id}`, {
+    const token = localStorage.getItem('accessToken')
+    const response = await fetch(`/dashboard/v1/accounts/${editForm.value.id}`, {
       method: 'PUT',
       headers: {
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(editForm.value)
     })
 
     if (!response.ok) {
-      throw new Error('Failed to update account')
+      if (response.status === 401) {
+        // Токен истёк — пробуем обновить
+        const refreshed = await userStore.refresh()
+
+        if (refreshed) {
+          // Повторяем оригинальный запрос (например, через ту же функцию)
+          return await retryOriginalRequest()
+        } else {
+          // Обновление не удалось — разлогиниваем
+          userStore.logout()
+          router.push('/login')
+        }
+      } else {
+        // Обработка других ошибок
+        console.error('Ошибка запроса:', await response.json())
+      }
     }
 
     // Update the local data
@@ -247,12 +291,31 @@ const closeDeleteModal = () => {
 
 const deleteAccount = async () => {
   try {
-    const response = await fetch(`/dashboard/api/v1/account/${accountToDelete.value}`, {
-      method: 'DELETE'
+    const token = localStorage.getItem('accessToken')
+    const response = await fetch(`/dashboard/v1/accounts/${accountToDelete.value}`, {
+      method: 'DELETE',
+      headers: {
+          'Authorization': `Bearer ${token}`,
+      }
     })
 
     if (!response.ok) {
-      throw new Error('Failed to delete account')
+      if (response.status === 401) {
+        // Токен истёк — пробуем обновить
+        const refreshed = await userStore.refresh()
+
+        if (refreshed) {
+          // Повторяем оригинальный запрос (например, через ту же функцию)
+          return await retryOriginalRequest()
+        } else {
+          // Обновление не удалось — разлогиниваем
+          userStore.logout()
+          router.push('/login')
+        }
+      } else {
+        // Обработка других ошибок
+        console.error('Ошибка запроса:', await response.json())
+      }
     }
 
     // Remove the account from local data

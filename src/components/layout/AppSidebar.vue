@@ -20,7 +20,7 @@
       ]"
     >
       <router-link to="/accounts">
-      <p class='mb-6 text-xs uppercase flex leading-[30px] text-black-600'>Pixverse Dashboard</p>
+      <p class='text-xl font-semibold text-gray-800 dark:text-white/90'>Pixverse</p>
       </router-link>
     </div>
     <div
@@ -219,17 +219,6 @@ const menuGroups = [
   {
     title: "Menu",
     items: [
-      // {
-      //   icon: GridIcon,
-      //   name: "Dashboard",
-      //   subItems: [{ name: "Ecommerce", path: "/", pro: false }],
-      // },
-      // {
-      //   icon: UserCircleIcon,
-      //   name: "User Profile",
-      //   path: "/profile",
-      // },
-
       {
         name: "Таблицы",
         icon: TableIcon,

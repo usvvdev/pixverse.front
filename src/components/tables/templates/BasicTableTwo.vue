@@ -13,7 +13,7 @@
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Name</p>
             </th>
             <th class="px-5 py-3 text-left w-2/11 sm:px-6">
-              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Template ID</p>
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Prompt</p>
             </th>
             <th class="px-5 py-3 text-left w-2/11 sm:px-6">
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Category</p>
@@ -40,18 +40,20 @@
             <td class="px-5 py-4 sm:px-6">
               <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ style.name }}</p>
             </td>
-            <td class="px-5 py-4 sm:px-6">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ style.template_id }}</p>
+            <td class="px-5 py-4 sm:px-6 max-w-[200px]">
+              <p class="text-gray-500 text-theme-sm dark:text-gray-400 truncate whitespace-nowrap overflow-hidden">
+                {{ style.prompt }}
+              </p>
             </td>
             <td class="px-5 py-4 sm:px-6">
               <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ style.category }}</p>
             </td>
             <td class="px-5 py-4 sm:px-6">
               <img
-                :src="style.preview"
+                :src="style.preview_small"
                 alt="Preview"
                 class="max-w-[300px] max-h-[auto] object-cover rounded"
-                @click="openImage(style.preview)"
+                @click="openImage(style.preview_small)"
               />
             </td>
             <td class="px-5 py-4 sm:px-6">
@@ -286,7 +288,7 @@ const isDeleting = ref(false)
 
 const fetchStyles = async () => {
   try {
-    const response = await fetch('/dashboard/api/v1/templates')
+    const response = await fetch('/dashboard/v1/templates')
     if (!response.ok) {
       throw new Error('Failed to fetch styles')
     }
@@ -343,9 +345,13 @@ const updateStyle = async () => {
       formData.append('remove_preview', 'true')
     }
 
-    const response = await fetch(`/dashboard/api/v1/template/${editForm.value.id}`, {
+    const token = localStorage.getItem('accessToken')
+    const response = await fetch(`/dashboard/v1/template/${editForm.value.id}`, {
       method: 'PUT',
       body: formData,
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     })
 
     if (!response.ok) {
@@ -381,8 +387,12 @@ const closeDeleteModal = () => {
 const deleteStyle = async () => {
   isDeleting.value = true
   try {
-    const response = await fetch(`/dashboard/api/v1/template/${styleToDelete.value}`, {
+    const token = localStorage.getItem('accessToken')
+    const response = await fetch(`/dashboard/v1/template/${styleToDelete.value}`, {
       method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     })
 
     if (!response.ok) {

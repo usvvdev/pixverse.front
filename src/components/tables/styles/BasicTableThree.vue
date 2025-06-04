@@ -13,7 +13,7 @@
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Name</p>
             </th>
             <th class="px-5 py-3 text-left w-2/11 sm:px-6">
-              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Template ID</p>
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Prompt</p>
             </th>
             <th class="px-5 py-3 text-left w-2/11 sm:px-6">
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Preview</p>
@@ -37,15 +37,17 @@
             <td class="px-5 py-4 sm:px-6">
               <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ style.name }}</p>
             </td>
-            <td class="px-5 py-4 sm:px-6">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ style.template_id }}</p>
+            <td class="px-5 py-4 sm:px-6 max-w-[200px]">
+              <p class="text-gray-500 text-theme-sm dark:text-gray-400 truncate whitespace-nowrap overflow-hidden">
+                {{ style.prompt }}
+              </p>
             </td>
             <td class="px-5 py-4 sm:px-6">
               <img
                 :src="style.preview"
                 alt="Preview"
                 class="max-w-[300px] max-h-[auto] object-cover rounded"
-                @click="openImage(style.preview)"
+                @click="openImage(style.preview_small)"
               >
             </td>
             <td class="px-5 py-4 sm:px-6">
@@ -90,15 +92,15 @@
               <input v-model="editForm.name" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Template ID</label>
-              <input v-model="editForm.template_id" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Promt</label>
+              <input v-model="editForm.prompt" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Preview Image</label>
               <div class="mt-1 flex items-center">
                 <img
-                  v-if="editForm.preview && !newImage"
-                  :src="editForm.preview"
+                  v-if="editForm.preview_small && !newImage"
+                  :src="editForm.preview_small"
                   class="h-20 w-20 object-cover rounded mr-4"
                 >
                 <img
@@ -118,10 +120,10 @@
                   @click="$refs.fileInput.click()"
                   class="ml-3 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 >
-                  {{ editForm.preview || previewImage ? 'Change Image' : 'Upload Image' }}
+                  {{ editForm.preview_small || previewImage ? 'Change Image' : 'Upload Image' }}
                 </button>
                 <button
-                  v-if="editForm.preview || previewImage"
+                  v-if="editForm.preview_small || previewImage"
                   type="button"
                   @click="removeImage"
                   class="ml-3 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -203,6 +205,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
+import { useAuthStore } from '@/stores/auth'
+
 const styles = ref([])
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
@@ -210,17 +214,19 @@ const styleToDelete = ref(null)
 const editForm = ref({
   id: null,
   name: '',
-  template_id: '',
-  preview: null
+  prompt: '',
+  preview_small: null
 })
 const previewImage = ref(null)
 const newImage = ref(null)
 const isUpdating = ref(false)
 const isDeleting = ref(false)
 
+const userStore = useAuthStore()
+
 const fetchStyles = async () => {
   try {
-    const response = await fetch('/dashboard/api/v1/styles')
+    const response = await fetch('/dashboard/v1/styles')
     if (!response.ok) {
       throw new Error('Failed to fetch styles')
     }
@@ -277,13 +283,32 @@ const updateStyle = async () => {
       formData.append('remove_preview', 'true')
     }
 
-    const response = await fetch(`/dashboard/api/v1/style/${editForm.value.id}`, {
+    const token = localStorage.getItem('accessToken')
+    const response = await fetch(`/dashboard/v1/styles/${editForm.value.id}`, {
       method: 'PUT',
-      body: formData
+      body: formData,
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     })
 
     if (!response.ok) {
-      throw new Error('Failed to update style')
+      if (response.status === 401) {
+        // Токен истёк — пробуем обновить
+        const refreshed = await userStore.refresh()
+
+        if (refreshed) {
+          // Повторяем оригинальный запрос (например, через ту же функцию)
+          return await retryOriginalRequest()
+        } else {
+          // Обновление не удалось — разлогиниваем
+          userStore.logout()
+          router.push('/login')
+        }
+      } else {
+        // Обработка других ошибок
+        console.error('Ошибка запроса:', await response.json())
+      }
     }
 
     const updatedStyle = await response.json()
@@ -315,12 +340,31 @@ const closeDeleteModal = () => {
 const deleteStyle = async () => {
   isDeleting.value = true
   try {
-    const response = await fetch(`/dashboard/api/v1/style/${styleToDelete.value}`, {
-      method: 'DELETE'
+    const token = localStorage.getItem('accessToken')
+    const response = await fetch(`/dashboard/v1/styles/${styleToDelete.value}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     })
 
     if (!response.ok) {
-      throw new Error('Failed to delete style')
+      if (response.status === 401) {
+        // Токен истёк — пробуем обновить
+        const refreshed = await userStore.refresh()
+
+        if (refreshed) {
+          // Повторяем оригинальный запрос (например, через ту же функцию)
+          return await retryOriginalRequest()
+        } else {
+          // Обновление не удалось — разлогиниваем
+          userStore.logout()
+          router.push('/login')
+        }
+      } else {
+        // Обработка других ошибок
+        console.error('Ошибка запроса:', await response.json())
+      }
     }
 
     // Remove the style from local data

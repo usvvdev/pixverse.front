@@ -6,11 +6,14 @@
     ]"
   >
     <!-- Card Header -->
-    <div class="px-6 py-5">
-      <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
-        {{ title }}
-      </h3>
-      <p v-if="desc" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+    <div class="px-6 py-5 flex items-center justify-between">
+      <div class="flex items-center">
+        <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
+          {{ title }}
+        </h3>
+      </div>
+      <CommonButton/>
+      <p v-if="desc" class="mt-1 text-sm text-gray-500 dark:text-gray-400 absolute top-full left-6 w-full">
         {{ desc }}
       </p>
     </div>
@@ -26,6 +29,7 @@
 
 <script setup lang="ts">
 import { defineProps } from 'vue'
+import CommonButton from './CommonButton.vue'
 
 interface Props {
   title: string

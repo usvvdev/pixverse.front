@@ -6,22 +6,14 @@ const router = createRouter({
     return savedPosition || { left: 0, top: 0 }
   },
   routes: [
-    // {
-    //   path: '/',
-    //   name: 'Ecommerce',
-    //   component: () => import('../views/Ecommerce.vue'),
-    //   meta: {
-    //     title: 'eCommerce Dashboard',
-    //   },
-    // },
-    // {
-    //   path: '/profile',
-    //   name: 'Profile',
-    //   component: () => import('../views/Others/UserProfile.vue'),
-    //   meta: {
-    //     title: 'Profile',
-    //   },
-    // },
+    {
+      path: '/',
+      name: 'Авторизация',
+      component: () => import('../components/layout/LoginLayout.vue'),
+      meta: {
+        title: 'Авторизация',
+      },
+    },
     {
       path: '/styles',
       name: 'Стили',
@@ -49,20 +41,12 @@ const router = createRouter({
       },
     },
 
-    {
-      path: '/signin',
-      name: 'Signin',
-      component: () => import('../views/Auth/Signin.vue'),
-      meta: {
-        title: 'Signin',
-      },
-    },
   ],
 })
 
 export default router
 
 router.beforeEach((to, from, next) => {
-  document.title = `Vue.js ${to.meta.title} | TailAdmin - Vue.js Tailwind CSS Dashboard Template`
+  document.title = `Pixverse | ${to.meta.title}`
   next()
 })
