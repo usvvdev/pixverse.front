@@ -23,9 +23,10 @@ export const useAuthStore = defineStore('auth', {
       localStorage.clear()
     },
     async refresh() {
-      const res = await axios.post('/auth/api/v1/refresh', {}, {
-        headers: { Authorization: `Bearer ${this.refreshToken}` }
-      })
+      const res = await axios.post('/auth/api/v1/refresh',
+        { refresh_token: this.refreshToken }
+        // headers: { Authorization: `Bearer ${this.refreshToken}` }
+      )
       this.accessToken = res.data.access_token
       localStorage.setItem('accessToken', this.accessToken)
     }
