@@ -188,7 +188,7 @@ const userStore = useAuthStore()
 const fetchAccounts = async () => {
   try {
     const token = localStorage.getItem('accessToken')
-    const response = await fetch('/dashboard/v1/accounts', {
+    const response = await fetch('/dashboard/api/v1/accounts', {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -206,7 +206,7 @@ const fetchAccounts = async () => {
         } else {
           // Обновление не удалось — разлогиниваем
           userStore.logout()
-          router.push('/login')
+          router.push('/')
         }
       } else {
         // Обработка других ошибок
@@ -239,7 +239,7 @@ const closeEditModal = () => {
 const updateAccount = async () => {
   try {
     const token = localStorage.getItem('accessToken')
-    const response = await fetch(`/dashboard/v1/accounts/${editForm.value.id}`, {
+    const response = await fetch(`/dashboard/api/v1/accounts/${editForm.value.id}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -259,7 +259,7 @@ const updateAccount = async () => {
         } else {
           // Обновление не удалось — разлогиниваем
           userStore.logout()
-          router.push('/login')
+          router.push('/')
         }
       } else {
         // Обработка других ошибок
@@ -292,7 +292,7 @@ const closeDeleteModal = () => {
 const deleteAccount = async () => {
   try {
     const token = localStorage.getItem('accessToken')
-    const response = await fetch(`/dashboard/v1/accounts/${accountToDelete.value}`, {
+    const response = await fetch(`/dashboard/api/v1/accounts/${accountToDelete.value}`, {
       method: 'DELETE',
       headers: {
           'Authorization': `Bearer ${token}`,
@@ -310,7 +310,7 @@ const deleteAccount = async () => {
         } else {
           // Обновление не удалось — разлогиниваем
           userStore.logout()
-          router.push('/login')
+          router.push('/')
         }
       } else {
         // Обработка других ошибок

@@ -270,6 +270,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 
 const styles = ref([])
 const showEditModal = ref(false)
@@ -286,9 +287,11 @@ const newImage = ref(null)
 const isUpdating = ref(false)
 const isDeleting = ref(false)
 
+const userStore = useAuthStore()
+
 const fetchStyles = async () => {
   try {
-    const response = await fetch('/dashboard/v1/templates')
+    const response = await fetch('/dashboard/api/v1/templates')
     if (!response.ok) {
       throw new Error('Failed to fetch styles')
     }
@@ -346,7 +349,7 @@ const updateStyle = async () => {
     }
 
     const token = localStorage.getItem('accessToken')
-    const response = await fetch(`/dashboard/v1/template/${editForm.value.id}`, {
+    const response = await fetch(`/dashboard/api/v1/template/${editForm.value.id}`, {
       method: 'PUT',
       body: formData,
       headers: {
@@ -355,7 +358,22 @@ const updateStyle = async () => {
     })
 
     if (!response.ok) {
-      throw new Error('Failed to update style')
+      if (response.status === 401) {
+        // Токен истёк — пробуем обновить
+        const refreshed = await userStore.refresh()
+
+        if (refreshed) {
+          // Повторяем оригинальный запрос (например, через ту же функцию)
+          return await retryOriginalRequest()
+        } else {
+          // Обновление не удалось — разлогиниваем
+          userStore.logout()
+          router.push('/')
+        }
+      } else {
+        // Обработка других ошибок
+        console.error('Ошибка запроса:', await response.json())
+      }
     }
 
     const updatedStyle = await response.json()
@@ -388,7 +406,7 @@ const deleteStyle = async () => {
   isDeleting.value = true
   try {
     const token = localStorage.getItem('accessToken')
-    const response = await fetch(`/dashboard/v1/template/${styleToDelete.value}`, {
+    const response = await fetch(`/dashboard/api/v1/template/${styleToDelete.value}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -396,7 +414,22 @@ const deleteStyle = async () => {
     })
 
     if (!response.ok) {
-      throw new Error('Failed to delete style')
+      if (response.status === 401) {
+        // Токен истёк — пробуем обновить
+        const refreshed = await userStore.refresh()
+
+        if (refreshed) {
+          // Повторяем оригинальный запрос (например, через ту же функцию)
+          return await retryOriginalRequest()
+        } else {
+          // Обновление не удалось — разлогиниваем
+          userStore.logout()
+          router.push('/')
+        }
+      } else {
+        // Обработка других ошибок
+        console.error('Ошибка запроса:', await response.json())
+      }
     }
 
     // Remove the style from local data

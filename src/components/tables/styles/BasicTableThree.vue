@@ -226,7 +226,7 @@ const userStore = useAuthStore()
 
 const fetchStyles = async () => {
   try {
-    const response = await fetch('/dashboard/v1/styles')
+    const response = await fetch('/dashboard/api/v1/styles')
     if (!response.ok) {
       throw new Error('Failed to fetch styles')
     }
@@ -284,7 +284,7 @@ const updateStyle = async () => {
     }
 
     const token = localStorage.getItem('accessToken')
-    const response = await fetch(`/dashboard/v1/styles/${editForm.value.id}`, {
+    const response = await fetch(`/dashboard/api/v1/styles/${editForm.value.id}`, {
       method: 'PUT',
       body: formData,
       headers: {
@@ -303,7 +303,7 @@ const updateStyle = async () => {
         } else {
           // Обновление не удалось — разлогиниваем
           userStore.logout()
-          router.push('/login')
+          router.push('/')
         }
       } else {
         // Обработка других ошибок
@@ -341,7 +341,7 @@ const deleteStyle = async () => {
   isDeleting.value = true
   try {
     const token = localStorage.getItem('accessToken')
-    const response = await fetch(`/dashboard/v1/styles/${styleToDelete.value}`, {
+    const response = await fetch(`/dashboard/api/v1/styles/${styleToDelete.value}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -359,7 +359,7 @@ const deleteStyle = async () => {
         } else {
           // Обновление не удалось — разлогиниваем
           userStore.logout()
-          router.push('/login')
+          router.push('/')
         }
       } else {
         // Обработка других ошибок

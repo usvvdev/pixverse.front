@@ -65,6 +65,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+
+const userStore = useAuthStore()
 
 const accounts = ref([])
 const showEditModal = ref(false)
@@ -104,7 +107,7 @@ const closeCreateModal = () => {
 const createAccount = async () => {
   try {
     const token = localStorage.getItem('accessToken')
-    const response = await fetch('/dashboard/v1/accounts', {
+    const response = await fetch('/dashboard/api/v1/accounts', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -114,7 +117,22 @@ const createAccount = async () => {
     })
 
     if (!response.ok) {
-      throw new Error('Failed to create account')
+      if (response.status === 401) {
+        // Токен истёк — пробуем обновить
+        const refreshed = await userStore.refresh()
+
+        if (refreshed) {
+          // Повторяем оригинальный запрос (например, через ту же функцию)
+          return await retryOriginalRequest()
+        } else {
+          // Обновление не удалось — разлогиниваем
+          userStore.logout()
+          router.push('/')
+        }
+      } else {
+        // Обработка других ошибок
+        console.error('Ошибка запроса:', await response.json())
+      }
     }
 
     const newAccount = await response.json()
