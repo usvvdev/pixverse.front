@@ -37,8 +37,8 @@
             <td class="px-5 py-4 sm:px-6">
               <video
                 v-if="style.preview_small"
-                :src="style.preview_small?.replace('/uploads/', '') ? `https://api-use-core.store/static/${style.preview_small.replace('/uploads/', '')}` : null"
-                controls
+                :src="style.preview_small?.replace('uploads/', '') ? `https://api-use-core.store/static/${style.preview_small.replace('uploads/', '')}` : null"
+                controls=""
                 class="max-w-[300px] rounded"
               ></video>
             </td>
