@@ -96,7 +96,7 @@
       <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
       <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full dark:bg-gray-800">
         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 dark:bg-gray-800">
-          <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">Edit Account</h3>
+          <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">Редактирование аккаунта</h3>
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
@@ -104,13 +104,13 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
-              <input v-model="editForm.password" type="password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
+              <input v-model="editForm.password" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
               <select v-model="editForm.is_active" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
-                <option :value="true">Active</option>
-                <option :value="false">Inactive</option>
+                <option :value="true">Активный</option>
+                <option :value="false">Инактивный</option>
               </select>
             </div>
             <div>
@@ -147,19 +147,19 @@
               </svg>
             </div>
             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-              <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Delete account</h3>
+              <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Удалить аккаунт</h3>
               <div class="mt-2">
-                <p class="text-sm text-gray-500 dark:text-gray-400">Are you sure you want to delete this account? This action cannot be undone.</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Вы уверены, что хотите удалить аакаунт? Это действие будет невозвртано.</p>
               </div>
             </div>
           </div>
         </div>
         <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse dark:bg-gray-800">
           <button type="button" @click="deleteAccount" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
-            Delete
+            Удалить
           </button>
           <button type="button" @click="closeDeleteModal" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600">
-            Cancel
+            Отменить
           </button>
         </div>
       </div>

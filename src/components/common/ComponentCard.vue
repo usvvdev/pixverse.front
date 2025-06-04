@@ -12,7 +12,7 @@
           {{ title }}
         </h3>
       </div>
-      <CommonButton/>
+      <slot name="action"/>
       <p v-if="desc" class="mt-1 text-sm text-gray-500 dark:text-gray-400 absolute top-full left-6 w-full">
         {{ desc }}
       </p>
@@ -21,7 +21,7 @@
     <!-- Card Body -->
     <div class="p-4 border-t border-gray-100 dark:border-gray-800 sm:p-6">
       <div class="space-y-5">
-        <slot></slot>
+        <slot/>
       </div>
     </div>
   </div>

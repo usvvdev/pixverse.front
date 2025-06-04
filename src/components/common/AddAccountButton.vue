@@ -24,7 +24,7 @@
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
         <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full dark:bg-gray-800">
           <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 dark:bg-gray-800">
-            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">Create New Account</h3>
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">Добавить новый акаунт</h3>
             <div class="space-y-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
@@ -32,18 +32,7 @@
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
-                <input v-model="createForm.password" type="password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                <select v-model="createForm.is_active" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
-                  <option :value="true">Active</option>
-                  <option :value="false">Inactive</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Balance</label>
-                <input v-model="createForm.balance" type="number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
+                <input v-model="createForm.password" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
               </div>
             </div>
           </div>
@@ -63,11 +52,14 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 
 const userStore = useAuthStore()
+
+const router = useRouter()
 
 const accounts = ref([])
 const showEditModal = ref(false)
@@ -86,8 +78,6 @@ const editForm = ref({
 const createForm = ref({
   username: '',
   password: '',
-  is_active: true,
-  balance: 0
 })
 
 const openCreateModal = () => {

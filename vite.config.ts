@@ -20,17 +20,19 @@ export default defineConfig({
   server: {
     proxy: {
       '/auth': {
-        target: 'http://localhost:8000',
+        target: 'https://api-use-core.store/auth/',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/auth/, '/auth/api'),
+        ws: true,
+        rewrite: (path) => path.replace(/^\/auth/, '/auth'),
       },
-      // '/dashboard': {
-      //   target: 'http://localhost:8000',
-      //   changeOrigin: true,
-      //   secure: false,
-      //   rewrite: (path) => path.replace(/^\/dashboard/, '/dashboard/api'),
-      // },
+      '/dashboard': {
+        target: 'https://api-use-core.store/dashboard/',
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+        rewrite: (path) => path.replace(/^\/dashboard/, '/dashboard'),
+      },
     },
   }
 })
