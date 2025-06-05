@@ -22,6 +22,9 @@
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Prompt</p>
             </th>
             <th class="px-5 py-3 text-left w-2/11 sm:px-6">
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</p>
+            </th>
+            <th class="px-5 py-3 text-left w-2/11 sm:px-6">
               <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Actions</p>
             </th>
           </tr>
@@ -40,7 +43,7 @@
             <td class="px-5 py-4 sm:px-6">
               <video
                 v-if="style.preview_small"
-                :src="style.preview_small?.replace('uploads/', '') ? `https://api-use-core.store/static/${style.preview_small.replace('uploads/', '')}` : null"
+                :src="style.preview_small"
                 controls=""
                 class="max-w-[300px] rounded"
               ></video>
@@ -55,6 +58,21 @@
               <p class="text-gray-500 text-theme-sm dark:text-gray-400 truncate whitespace-nowrap overflow-hidden">
                 {{ style.prompt }}
               </p>
+            </td>
+            <td class="px-5 py-4 sm:px-6">
+              <span
+                :class="[
+                  'rounded-full px-2 py-0.5 text-theme-xs font-medium',
+                  {
+                    'bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-500':
+                      style.is_active,
+                    'bg-error-50 text-error-700 dark:bg-error-500/15 dark:text-error-500':
+                      !style.is_active,
+                  },
+                ]"
+              >
+                {{ style.is_active ? 'Активный' : 'Инактивный' }}
+              </span>
             </td>
             <td class="px-5 py-4 sm:px-6">
               <div class="flex items-center space-x-2">
@@ -282,6 +300,7 @@ const editForm = ref({
   name: '',
   category: '',
   prompt: '',
+  is_active: '',
   preview_small: null,
   preview_large: null
 })
