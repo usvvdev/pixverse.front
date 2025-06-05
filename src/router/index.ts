@@ -41,6 +41,15 @@ const router = createRouter({
       },
     },
 
+    {
+      path: '/applications',
+      name: 'Приложения',
+      component: () => import('../views/Tables/ApplicationTable.vue'),
+      meta: {
+        title: 'Приложения',
+      },
+    },
+
   ],
 })
 

@@ -1,91 +1,48 @@
 <template>
-  <div
-    class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
-  >
+  <div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
     <div class="max-w-full overflow-x-auto custom-scrollbar">
       <table class="min-w-full">
         <thead>
           <tr class="border-b border-gray-200 dark:border-gray-700">
-            <th class="px-5 py-3 text-left w-3/11 sm:px-6">
-              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">ID</p>
-            </th>
-            <th class="px-5 py-3 text-left w-2/11 sm:px-6">
-              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Preview</p>
-            </th>
-            <th class="px-5 py-3 text-left w-2/11 sm:px-6">
-              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Name</p>
-            </th>
-            <th class="px-5 py-3 text-left w-2/11 sm:px-6">
-              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Prompt</p>
-            </th>
-            <th class="px-5 py-3 text-left w-2/11 sm:px-6">
-              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</p>
-            </th>
-            <th class="px-5 py-3 text-left w-2/11 sm:px-6">
-              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Actions</p>
-            </th>
+            <th class="px-5 py-3 text-left sm:px-6">ID</th>
+            <th class="px-5 py-3 text-left sm:px-6">App ID</th>
+            <th class="px-5 py-3 text-left sm:px-6">Templates</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
           <tr
-            v-for="(style, index) in styles"
-            :key="index"
+            v-for="item in styles"
+            :key="item.id"
             class="border-t border-gray-100 dark:border-gray-800"
           >
-            <td class="px-5 py-4 sm:px-6">
-              <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                {{ style.id }}
-              </span>
+            <td class="px-5 py-4 sm:px-6 text-theme-sm text-gray-800 dark:text-white/90">
+              {{ item.id }}
+            </td>
+            <td class="px-5 py-4 sm:px-6 text-theme-sm text-gray-600 dark:text-gray-400">
+              {{ item.app_id }}
             </td>
             <td class="px-5 py-4 sm:px-6">
-              <video
-                v-if="style.preview_small"
-                :src="style.preview_small"
-                controls=""
-                class="max-w-[150px] rounded"
-              ></video>
-            </td>
-            <td class="px-5 py-4 sm:px-6">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ style.name }}</p>
-            </td>
-            <td class="px-5 py-4 sm:px-6 max-w-[200px]">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400 truncate whitespace-nowrap overflow-hidden">
-                {{ style.prompt }}
-              </p>
-            </td>
-            <td class="px-5 py-4 sm:px-6">
-              <span
-                :class="[
-                  'rounded-full px-2 py-0.5 text-theme-xs font-medium',
-                  {
-                    'bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-500':
-                      style.is_active,
-                    'bg-error-50 text-error-700 dark:bg-error-500/15 dark:text-error-500':
-                      !style.is_active,
-                  },
-                ]"
-              >
-                {{ style.is_active ? 'Активный' : 'Инактивный' }}
-              </span>
-            </td>
-            <td class="px-5 py-4 sm:px-6">
-              <div class="flex items-center space-x-2">
-                <button
-                  @click="openEditModal(style)"
-                  class="p-1 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <div
+                  v-for="template in item.templates"
+                  :key="template.name"
+                  class="flex flex-col items-center gap-2"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                  </svg>
-                </button>
-                <button
-                  @click="confirmDelete(style.id)"
-                  class="p-1 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                  </svg>
-                </button>
+                  <video
+                    v-if="template.preview_small"
+                    :src="template.preview_small"
+                    controls
+                    class="w-24 h-16 rounded shadow"
+                  ></video>
+                  <div class="text-center">
+                    <p class="text-xs font-medium text-gray-700 dark:text-white truncate">
+                      {{ template.name }}
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {{ template.category }}
+                    </p>
+                  </div>
+                </div>
               </div>
             </td>
           </tr>
@@ -121,6 +78,17 @@
             <div>
               <label
                 class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >Category</label
+              >
+              <input
+                v-model="editForm.category"
+                type="text"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
                 >Prompt</label
               >
               <input
@@ -129,57 +97,89 @@
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
               />
             </div>
-            <div>
-              <label
-                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >Status</label
-              >
-              <select v-model="editForm.is_active" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
-                <option :value="true">Активный</option>
-                <option :value="false">Инактивный</option>
-              </select>
-            </div>
 
             <!-- Video small -->
-           <div>
+            <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Preview Small</label>
               <div class="mt-1 flex items-center">
                 <video
-                  v-if="previewUrls.small"
-                  :src="previewUrls.small"
+                  v-if="editForm.preview_small && !previewSmallFile"
+                  :src="editForm.preview_small"
+                  class="h-20 w-20 rounded mr-4"
+                  controls
+                ></video>
+                <video
+                  v-if="previewSmallFileUrl"
+                  :src="previewSmallFileUrl"
                   class="h-20 w-20 rounded mr-4"
                   controls
                 ></video>
                 <input
                   type="file"
+                  ref="smallFileInput"
                   accept="video/*"
-                  @change="onVideoUpload($event, 'small')"
-                  class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-300"
+                  @change="handleVideoUpload($event, 'small')"
+                  class="hidden"
                 />
+                <button
+                  type="button"
+                  @click="$refs.smallFileInput.click()"
+                  class="ml-3 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                >
+                  {{ (editForm.preview_small || previewSmallFileUrl) ? 'Change Video' : 'Upload Video' }}
+                </button>
+                <button
+                  v-if="editForm.preview_small || previewSmallFileUrl"
+                  type="button"
+                  @click="removeVideo('small')"
+                  class="ml-3 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                >
+                  Remove
+                </button>
               </div>
             </div>
 
             <!-- Video large -->
-             <div>
+            <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Preview Large</label>
               <div class="mt-1 flex items-center">
                 <video
-                  v-if="previewUrls.large"
-                  :src="previewUrls.large"
+                  v-if="editForm.preview_large && !previewLargeFile"
+                  :src="editForm.preview_large"
+                  class="h-20 w-20 rounded mr-4"
+                  controls
+                ></video>
+                <video
+                  v-if="previewLargeFileUrl"
+                  :src="previewLargeFileUrl"
                   class="h-20 w-20 rounded mr-4"
                   controls
                 ></video>
                 <input
                   type="file"
+                  ref="largeFileInput"
                   accept="video/*"
-                  @change="onVideoUpload($event, 'large')"
-                  class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-300"
+                  @change="handleVideoUpload($event, 'large')"
+                  class="hidden"
                 />
+                <button
+                  type="button"
+                  @click="$refs.largeFileInput.click()"
+                  class="ml-3 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                >
+                  {{ (editForm.preview_large || previewLargeFileUrl) ? 'Change Video' : 'Upload Video' }}
+                </button>
+                <button
+                  v-if="editForm.preview_large || previewLargeFileUrl"
+                  type="button"
+                  @click="removeVideo('large')"
+                  class="ml-3 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                >
+                  Remove
+                </button>
               </div>
             </div>
           </div>
-        </div>
-        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse dark:bg-gray-800">
           <button type="button" @click="updateStyle" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
             Сохранить
           </button>
@@ -207,9 +207,9 @@
               </svg>
             </div>
             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-              <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Удалить стиль</h3>
+              <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Удалить шаблон</h3>
               <div class="mt-2">
-                <p class="text-sm text-gray-500 dark:text-gray-400">Вы уверены, что хотите удалить стиль? Это дейсвтие будет невозвратно.</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Вы уверены, что хотите удалить шаблон? Это действие будет невозвратно.</p>
               </div>
             </div>
           </div>
@@ -222,14 +222,14 @@
             class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span v-if="isDeleting">Deleting...</span>
-            <span v-else>Удалить</span>
+            <span v-else>Delete</span>
           </button>
           <button
             type="button"
             @click="closeDeleteModal"
             class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600"
           >
-            Отменить
+            Cancel
           </button>
         </div>
       </div>
@@ -246,21 +246,17 @@ const styles = ref([])
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
 const styleToDelete = ref(null)
-
 const editForm = ref({
   id: null,
   name: '',
+  category: '',
   prompt: '',
   is_active: '',
-  previewSmallFile: null,
-  previewLargeFile: null
+  preview_small: null,
+  preview_large: null
 })
-
-const previewUrls = ref({
-  small: '',
-  large: ''
-})
-
+const previewImage = ref(null)
+const newImage = ref(null)
 const isUpdating = ref(false)
 const isDeleting = ref(false)
 
@@ -268,13 +264,13 @@ const userStore = useAuthStore()
 
 const fetchStyles = async () => {
   try {
-    const response = await fetch('/dashboard/api/v1/styles')
+    const response = await fetch('/dashboard/api/v1/applications')
     if (!response.ok) {
-      throw new Error('Failed to fetch styles')
+      throw new Error('Failed to fetch templates')
     }
     styles.value = await response.json()
   } catch (error) {
-    console.error('Error fetching styles:', error)
+    console.error('Error fetching templates:', error)
   }
 }
 
@@ -283,10 +279,12 @@ const openEditModal = (style) => {
     id: style.id,
     name: style.name,
     prompt: style.prompt,
-    is_active: style.is_active,
-    previewSmallFile: style.previewSmallFile,
-    previewLargeFile: style.previewLargeFile
+    category: style.category,
+    preview_small: style.preview_small,
+    preview_large: style.preview_large
   }
+  previewImage.value = null
+  newImage.value = null
   showEditModal.value = true
 }
 
@@ -294,46 +292,21 @@ const closeEditModal = () => {
   showEditModal.value = false
 }
 
-const onVideoUpload = (event, size) => {
-  const file = event.target.files?.[0]
-  if (!file) return
-
-  const url = URL.createObjectURL(file)
-
-  if (size === 'small') {
-    editForm.value.previewSmallFile = file
-    previewUrls.value.small = url
-  } else {
-    editForm.value.previewLargeFile = file
-    previewUrls.value.large = url
-  }
-}
-
 const updateStyle = async () => {
   isUpdating.value = true
   try {
-    const token = localStorage.getItem('accessToken')
-
-    // Формируем query-параметры
-    const query = new URLSearchParams({
-      name: editForm.value.name,
-      prompt: editForm.value.prompt,
-      category: editForm.value.category,
-      is_active: editForm.value.is_active,
-    }).toString()
-
-    // Формируем тело с файлами
     const formData = new FormData()
+    formData.append('name', editForm.value.name)
+    formData.append('template_id', editForm.value.template_id)
 
-    if (editForm.value.previewSmallFile) {
-      formData.append('preview_small', editForm.value.previewSmallFile)
+    if (newImage.value) {
+      formData.append('preview', newImage.value)
+    } else if (!editForm.value.preview && !previewImage.value) {
+      formData.append('remove_preview', 'true')
     }
 
-    if (editForm.value.previewLargeFile) {
-      formData.append('preview_large', editForm.value.previewLargeFile)
-    }
-
-    const response = await fetch(`/dashboard/api/v1/styles/${editForm.value.id}?${query}`, {
+    const token = localStorage.getItem('accessToken')
+    const response = await fetch(`/dashboard/api/v1/templates/${editForm.value.id}`, {
       method: 'PUT',
       body: formData,
       headers: {
@@ -390,7 +363,7 @@ const deleteStyle = async () => {
   isDeleting.value = true
   try {
     const token = localStorage.getItem('accessToken')
-    const response = await fetch(`/dashboard/api/v1/styles/${styleToDelete.value}`, {
+    const response = await fetch(`/dashboard/api/v1/templates/${styleToDelete.value}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -424,10 +397,6 @@ const deleteStyle = async () => {
   } finally {
     isDeleting.value = false
   }
-}
-
-const openImage = (url) => {
-  window.open(url, '_blank')
 }
 
 onMounted(() => {

@@ -45,7 +45,7 @@
                 v-if="style.preview_small"
                 :src="style.preview_small"
                 controls=""
-                class="max-w-[300px] rounded"
+                class="max-w-[150px] rounded"
               ></video>
             </td>
             <td class="px-5 py-4 sm:px-6">
@@ -111,7 +111,7 @@
         class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full dark:bg-gray-800"
       >
         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 dark:bg-gray-800">
-          <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">Изменить стиль</h3>
+          <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">Изменить шаблон</h3>
           <div class="space-y-4">
             <div>
               <label
@@ -146,45 +146,33 @@
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
               />
             </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >Status</label
+              >
+              <select v-model="editForm.is_active" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
+                <option :value="true">Активный</option>
+                <option :value="false">Инактивный</option>
+              </select>
+            </div>
 
             <!-- Video small -->
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Preview Small</label>
               <div class="mt-1 flex items-center">
                 <video
-                  v-if="editForm.preview_small && !previewSmallFile"
-                  :src="editForm.preview_small"
-                  class="h-20 w-20 rounded mr-4"
-                  controls
-                ></video>
-                <video
-                  v-if="previewSmallFileUrl"
-                  :src="previewSmallFileUrl"
+                  v-if="previewUrls.small"
+                  :src="previewUrls.small"
                   class="h-20 w-20 rounded mr-4"
                   controls
                 ></video>
                 <input
                   type="file"
-                  ref="smallFileInput"
                   accept="video/*"
-                  @change="handleVideoUpload($event, 'small')"
-                  class="hidden"
+                  @change="onVideoUpload($event, 'small')"
+                  class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-300"
                 />
-                <button
-                  type="button"
-                  @click="$refs.smallFileInput.click()"
-                  class="ml-3 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                >
-                  {{ (editForm.preview_small || previewSmallFileUrl) ? 'Change Video' : 'Upload Video' }}
-                </button>
-                <button
-                  v-if="editForm.preview_small || previewSmallFileUrl"
-                  type="button"
-                  @click="removeVideo('small')"
-                  class="ml-3 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                >
-                  Remove
-                </button>
               </div>
             </div>
 
@@ -193,43 +181,23 @@
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Preview Large</label>
               <div class="mt-1 flex items-center">
                 <video
-                  v-if="editForm.preview_large && !previewLargeFile"
-                  :src="editForm.preview_large"
-                  class="h-20 w-20 rounded mr-4"
-                  controls
-                ></video>
-                <video
-                  v-if="previewLargeFileUrl"
-                  :src="previewLargeFileUrl"
+                  v-if="previewUrls.large"
+                  :src="previewUrls.large"
                   class="h-20 w-20 rounded mr-4"
                   controls
                 ></video>
                 <input
                   type="file"
-                  ref="largeFileInput"
                   accept="video/*"
-                  @change="handleVideoUpload($event, 'large')"
-                  class="hidden"
+                  @change="onVideoUpload($event, 'large')"
+                  class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-300"
                 />
-                <button
-                  type="button"
-                  @click="$refs.largeFileInput.click()"
-                  class="ml-3 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                >
-                  {{ (editForm.preview_large || previewLargeFileUrl) ? 'Change Video' : 'Upload Video' }}
-                </button>
-                <button
-                  v-if="editForm.preview_large || previewLargeFileUrl"
-                  type="button"
-                  @click="removeVideo('large')"
-                  class="ml-3 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                >
-                  Remove
-                </button>
               </div>
             </div>
           </div>
-          <button type="button" @click="updateStyle" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse dark:bg-gray-800">
+          <button type="button" @click="updateTemplate" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
             Сохранить
           </button>
           <button type="button" @click="closeEditModal" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600">
@@ -271,14 +239,14 @@
             class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span v-if="isDeleting">Deleting...</span>
-            <span v-else>Delete</span>
+            <span v-else>Удалить</span>
           </button>
           <button
             type="button"
             @click="closeDeleteModal"
             class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600"
           >
-            Cancel
+            Отменить
           </button>
         </div>
       </div>
@@ -295,17 +263,22 @@ const styles = ref([])
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
 const styleToDelete = ref(null)
+
 const editForm = ref({
   id: null,
   name: '',
   category: '',
   prompt: '',
   is_active: '',
-  preview_small: null,
-  preview_large: null
+  previewSmallFile: null,
+  previewLargeFile: null
 })
-const previewImage = ref(null)
-const newImage = ref(null)
+
+const previewUrls = ref({
+  small: '',
+  large: ''
+})
+
 const isUpdating = ref(false)
 const isDeleting = ref(false)
 
@@ -323,39 +296,81 @@ const fetchStyles = async () => {
   }
 }
 
+
 const openEditModal = (style) => {
   editForm.value = {
     id: style.id,
     name: style.name,
     prompt: style.prompt,
     category: style.category,
-    preview_small: style.preview_small,
-    preview_large: style.preview_large
+    is_active: style.is_active,
+    previewSmallFile: style.previewSmallFile,
+    previewLargeFile: style.previewLargeFile
   }
-  previewImage.value = null
-  newImage.value = null
   showEditModal.value = true
 }
 
 const closeEditModal = () => {
   showEditModal.value = false
+
+  editForm.value = {
+    name: '',
+    prompt: '',
+    category: '',
+    is_active: '',
+    previewSmallFile: null,
+    previewLargeFile: null,
+  }
+
+  if (previewUrls.value.small) URL.revokeObjectURL(previewUrls.value.small)
+  if (previewUrls.value.large) URL.revokeObjectURL(previewUrls.value.large)
+
+  previewUrls.value = {
+    small: '',
+    large: '',
+  }
 }
 
-const updateStyle = async () => {
+const onVideoUpload = (event, size) => {
+  const file = event.target.files?.[0]
+  if (!file) return
+
+  const url = URL.createObjectURL(file)
+
+  if (size === 'small') {
+    editForm.value.previewSmallFile = file
+    previewUrls.value.small = url
+  } else {
+    editForm.value.previewLargeFile = file
+    previewUrls.value.large = url
+  }
+}
+
+const updateTemplate = async () => {
   isUpdating.value = true
   try {
-    const formData = new FormData()
-    formData.append('name', editForm.value.name)
-    formData.append('template_id', editForm.value.template_id)
+    const token = localStorage.getItem('accessToken')
 
-    if (newImage.value) {
-      formData.append('preview', newImage.value)
-    } else if (!editForm.value.preview && !previewImage.value) {
-      formData.append('remove_preview', 'true')
+    // Формируем query-параметры
+    const query = new URLSearchParams({
+      name: editForm.value.name,
+      prompt: editForm.value.prompt,
+      category: editForm.value.category,
+      is_active: editForm.value.is_active,
+    }).toString()
+
+    // Формируем тело с файлами
+    const formData = new FormData()
+
+    if (editForm.value.previewSmallFile) {
+      formData.append('preview_small', editForm.value.previewSmallFile)
     }
 
-    const token = localStorage.getItem('accessToken')
-    const response = await fetch(`/dashboard/api/v1/templates/${editForm.value.id}`, {
+    if (editForm.value.previewLargeFile) {
+      formData.append('preview_large', editForm.value.previewLargeFile)
+    }
+
+    const response = await fetch(`/dashboard/api/v1/templates/${editForm.value.id}?${query}`, {
       method: 'PUT',
       body: formData,
       headers: {

@@ -225,7 +225,8 @@ const menuGroups = [
         subItems: [
           { name: "Аккаунты", path: "/accounts", pro: false },
           { name: "Шаблоны", path: "/templates", pro: false },
-          { name: "Стили", path: "/styles", pro: false }
+          { name: "Стили", path: "/styles", pro: false },
+          { name: "Приложения", path: "/applications", pro: false }
         ],
       },
     ],
