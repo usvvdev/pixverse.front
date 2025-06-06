@@ -4,9 +4,15 @@
       <table class="min-w-full">
         <thead>
           <tr class="border-b border-gray-200 dark:border-gray-700">
-            <th class="px-5 py-3 text-left sm:px-6">ID</th>
-            <th class="px-5 py-3 text-left sm:px-6">App ID</th>
-            <th class="px-5 py-3 text-left sm:px-6">Templates</th>
+            <th class="px-5 py-3 text-left w-3/11 sm:px-6">
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">ID</p>
+            </th>
+            <th class="px-5 py-3 text-left w-3/11 sm:px-6">
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">App Bundle ID</p>
+            </th>
+            <th class="px-5 py-3 text-left w-1/11 sm:px-6">
+              <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Actions</p>
+            </th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -15,34 +21,32 @@
             :key="item.id"
             class="border-t border-gray-100 dark:border-gray-800"
           >
-            <td class="px-5 py-4 sm:px-6 text-theme-sm text-gray-800 dark:text-white/90">
-              {{ item.id }}
+            <td class="px-5 py-4 sm:px-6 text-theme-sm">
+              <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                {{ item.id }}
+              </span>
             </td>
             <td class="px-5 py-4 sm:px-6 text-theme-sm text-gray-600 dark:text-gray-400">
               {{ item.app_id }}
             </td>
             <td class="px-5 py-4 sm:px-6">
-              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                <div
-                  v-for="template in item.templates"
-                  :key="template.name"
-                  class="flex flex-col items-center gap-2"
+              <div class="flex items-center space-x-2">
+                <button
+                  @click="openEditModal(item)"
+                  class="p-1 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
                 >
-                  <video
-                    v-if="template.preview_small"
-                    :src="template.preview_small"
-                    controls
-                    class="w-24 h-16 rounded shadow"
-                  ></video>
-                  <div class="text-center">
-                    <p class="text-xs font-medium text-gray-700 dark:text-white truncate">
-                      {{ template.name }}
-                    </p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                      {{ template.category }}
-                    </p>
-                  </div>
-                </div>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                  </svg>
+                </button>
+                <button
+                  @click="confirmDelete(item.id)"
+                  class="p-1 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                </button>
               </div>
             </td>
           </tr>
@@ -52,144 +56,109 @@
   </div>
 
   <!-- Edit Modal -->
-    <div v-if="showEditModal" class="fixed inset-0 z-50 overflow-y-auto">
-    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-      <div class="fixed inset-0 transition-opacity" aria-hidden="true" @click="closeEditModal">
-        <div class="absolute inset-0 bg-gray-500 opacity-75 dark:bg-gray-900 dark:opacity-75"></div>
-      </div>
-      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-      <div
-        class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full dark:bg-gray-800"
-      >
-        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 dark:bg-gray-800">
-          <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">Изменить стиль</h3>
-          <div class="space-y-4">
-            <div>
-              <label
-                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >Name</label
-              >
-              <input
-                v-model="editForm.name"
-                type="text"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
-              />
-            </div>
-            <div>
-              <label
-                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >Category</label
-              >
-              <input
-                v-model="editForm.category"
-                type="text"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
-              />
-            </div>
-            <div>
-              <label
-                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >Prompt</label
-              >
-              <input
-                v-model="editForm.prompt"
-                type="text"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
-              />
-            </div>
+   <div v-if="showEditModal" class="fixed inset-0 z-50 overflow-y-auto">
+  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 transition-opacity" aria-hidden="true" @click="closeEditModal">
+      <div class="absolute inset-0 bg-gray-500 opacity-75 dark:bg-gray-900 dark:opacity-75"></div>
+    </div>
+    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+    <div
+      class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full dark:bg-gray-800"
+    >
+      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 dark:bg-gray-800">
+        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">Изменить связку шаблонов и стилей</h3>
+        <div class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">App ID</label>
+            <input
+              v-model="editForm.app_id"
+              type="text"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+            />
+          </div>
 
-            <!-- Video small -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Preview Small</label>
-              <div class="mt-1 flex items-center">
-                <video
-                  v-if="editForm.preview_small && !previewSmallFile"
-                  :src="editForm.preview_small"
-                  class="h-20 w-20 rounded mr-4"
-                  controls
-                ></video>
-                <video
-                  v-if="previewSmallFileUrl"
-                  :src="previewSmallFileUrl"
-                  class="h-20 w-20 rounded mr-4"
-                  controls
-                ></video>
-                <input
-                  type="file"
-                  ref="smallFileInput"
-                  accept="video/*"
-                  @change="handleVideoUpload($event, 'small')"
-                  class="hidden"
-                />
-                <button
-                  type="button"
-                  @click="$refs.smallFileInput.click()"
-                  class="ml-3 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                >
-                  {{ (editForm.preview_small || previewSmallFileUrl) ? 'Change Video' : 'Upload Video' }}
-                </button>
-                <button
-                  v-if="editForm.preview_small || previewSmallFileUrl"
-                  type="button"
-                  @click="removeVideo('small')"
-                  class="ml-3 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-
-            <!-- Video large -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Preview Large</label>
-              <div class="mt-1 flex items-center">
-                <video
-                  v-if="editForm.preview_large && !previewLargeFile"
-                  :src="editForm.preview_large"
-                  class="h-20 w-20 rounded mr-4"
-                  controls
-                ></video>
-                <video
-                  v-if="previewLargeFileUrl"
-                  :src="previewLargeFileUrl"
-                  class="h-20 w-20 rounded mr-4"
-                  controls
-                ></video>
-                <input
-                  type="file"
-                  ref="largeFileInput"
-                  accept="video/*"
-                  @change="handleVideoUpload($event, 'large')"
-                  class="hidden"
-                />
-                <button
-                  type="button"
-                  @click="$refs.largeFileInput.click()"
-                  class="ml-3 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                >
-                  {{ (editForm.preview_large || previewLargeFileUrl) ? 'Change Video' : 'Upload Video' }}
-                </button>
-                <button
-                  v-if="editForm.preview_large || previewLargeFileUrl"
-                  type="button"
-                  @click="removeVideo('large')"
-                  class="ml-3 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                >
-                  Remove
-                </button>
+          <!-- Templates Selection -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Шаблоны</label>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-44 overflow-y-auto p-2">
+              <div
+                v-for="template in availableTemplates"
+                :key="template.id"
+                @click="toggleTemplateSelection(template.id)"
+                class="border rounded-lg p-3 cursor-pointer transition-all"
+                :class="{
+                  'border-blue-500 bg-blue-50 dark:bg-blue-900/30': selectedTemplateIds.includes(template.id),
+                  'border-gray-200 dark:border-gray-600': !selectedTemplateIds.includes(template.id)
+                }"
+              >
+                <div class="flex items-start space-x-3">
+                  <video
+                    :src="template.preview_small"
+                    class="h-12 w-12 rounded flex-shrink-0 object-cover"
+                    muted
+                    loop
+                    autoplay
+                  ></video>
+                  <div>
+                    <h4 class="text-sm font-medium text-gray-900 dark:text-white">{{ template.name }}</h4>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ template.category }}</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <button type="button" @click="updateStyle" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-            Сохранить
-          </button>
-          <button type="button" @click="closeEditModal" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600">
+
+          <!-- Styles Selection -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Стили</label>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-44 overflow-y-auto p-2">
+              <div
+                v-for="style in availableStyles"
+                :key="style.id"
+                @click="toggleStyleSelection(style.id)"
+                class="border rounded-lg p-3 cursor-pointer transition-all"
+                :class="{
+                  'border-blue-500 bg-blue-50 dark:bg-blue-900/30': selectedStyleIds.includes(style.id),
+                  'border-gray-200 dark:border-gray-600': !selectedStyleIds.includes(style.id)
+                }"
+              >
+                <div class="flex items-start space-x-3">
+                  <video
+                    :src="style.preview_small"
+                    class="h-12 w-12 rounded flex-shrink-0 object-cover"
+                    muted
+                    loop
+                    autoplay
+                  ></video>
+                  <div>
+                    <h4 class="text-sm font-medium text-gray-900 dark:text-white">{{ style.name }}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 flex justify-end space-x-3">
+          <button
+            type="button"
+            @click="closeEditModal"
+            class="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600"
+          >
             Отменить
+          </button>
+          <button
+            type="button"
+            @click="updateStyle"
+            class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm"
+          >
+            Сохранить
           </button>
         </div>
       </div>
     </div>
   </div>
+</div>
 
   <!-- Delete Confirmation Modal -->
   <div v-if="showDeleteModal" class="fixed inset-0 z-50 overflow-y-auto">
@@ -207,9 +176,9 @@
               </svg>
             </div>
             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-              <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Удалить шаблон</h3>
+              <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Удалить приложение</h3>
               <div class="mt-2">
-                <p class="text-sm text-gray-500 dark:text-gray-400">Вы уверены, что хотите удалить шаблон? Это действие будет невозвратно.</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Вы уверены, что хотите удалить приложение? Это действие будет невозвратно.</p>
               </div>
             </div>
           </div>
@@ -217,19 +186,19 @@
         <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse dark:bg-gray-800">
           <button
             type="button"
-            @click="deleteStyle"
+            @click="deleteApplication"
             :disabled="isDeleting"
             class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span v-if="isDeleting">Deleting...</span>
-            <span v-else>Delete</span>
+            <span v-else>Удалить</span>
           </button>
           <button
             type="button"
             @click="closeDeleteModal"
             class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600"
           >
-            Cancel
+            Отменить
           </button>
         </div>
       </div>
@@ -239,7 +208,6 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-
 import { useAuthStore } from '@/stores/auth'
 
 const styles = ref([])
@@ -248,17 +216,20 @@ const showDeleteModal = ref(false)
 const styleToDelete = ref(null)
 const editForm = ref({
   id: null,
-  name: '',
-  category: '',
-  prompt: '',
-  is_active: '',
-  preview_small: null,
-  preview_large: null
+  app_id: '',
+  template_ids: [],
+  style_ids: []
 })
 const previewImage = ref(null)
 const newImage = ref(null)
 const isUpdating = ref(false)
 const isDeleting = ref(false)
+
+// Новые данные для выбора шаблонов и стилей
+const availableTemplates = ref([])
+const availableStyles = ref([])
+const selectedTemplateIds = ref([])
+const selectedStyleIds = ref([])
 
 const userStore = useAuthStore()
 
@@ -266,52 +237,96 @@ const fetchStyles = async () => {
   try {
     const response = await fetch('/dashboard/api/v1/applications')
     if (!response.ok) {
-      throw new Error('Failed to fetch templates')
+      throw new Error('Failed to fetch applications')
     }
     styles.value = await response.json()
+  } catch (error) {
+    console.error('Error fetching applications:', error)
+  }
+}
+
+// Загрузка доступных шаблонов
+const fetchTemplates = async () => {
+  try {
+    const response = await fetch('/dashboard/api/v1/templates')
+    if (!response.ok) {
+      throw new Error('Failed to fetch templates')
+    }
+    availableTemplates.value = await response.json()
   } catch (error) {
     console.error('Error fetching templates:', error)
   }
 }
 
-const openEditModal = (style) => {
-  editForm.value = {
-    id: style.id,
-    name: style.name,
-    prompt: style.prompt,
-    category: style.category,
-    preview_small: style.preview_small,
-    preview_large: style.preview_large
+// Загрузка доступных стилей
+const fetchStylesList = async () => {
+  try {
+    const response = await fetch('/dashboard/api/v1/styles')
+    if (!response.ok) {
+      throw new Error('Failed to fetch styles')
+    }
+    availableStyles.value = await response.json()
+  } catch (error) {
+    console.error('Error fetching styles:', error)
   }
-  previewImage.value = null
-  newImage.value = null
+}
+
+const openEditModal = (application) => {
+  editForm.value = {
+    id: application.id,
+    app_id: application.app_id,
+    template_ids: application.templates ? application.templates.map(t => t.id) : [],
+    style_ids: application.styles ? application.styles.map(s => s.id) : []
+  }
+
+  // Устанавливаем выбранные ID
+  selectedTemplateIds.value = [...editForm.value.template_ids]
+  selectedStyleIds.value = [...editForm.value.style_ids]
+
   showEditModal.value = true
 }
 
 const closeEditModal = () => {
   showEditModal.value = false
+  selectedTemplateIds.value = []
+  selectedStyleIds.value = []
+}
+
+const toggleTemplateSelection = (id) => {
+  const index = selectedTemplateIds.value.indexOf(id)
+  if (index === -1) {
+    selectedTemplateIds.value.push(id)
+  } else {
+    selectedTemplateIds.value.splice(index, 1)
+  }
+}
+
+const toggleStyleSelection = (id) => {
+  const index = selectedStyleIds.value.indexOf(id)
+  if (index === -1) {
+    selectedStyleIds.value.push(id)
+  } else {
+    selectedStyleIds.value.splice(index, 1)
+  }
 }
 
 const updateStyle = async () => {
   isUpdating.value = true
   try {
-    const formData = new FormData()
-    formData.append('name', editForm.value.name)
-    formData.append('template_id', editForm.value.template_id)
-
-    if (newImage.value) {
-      formData.append('preview', newImage.value)
-    } else if (!editForm.value.preview && !previewImage.value) {
-      formData.append('remove_preview', 'true')
+    const token = localStorage.getItem('accessToken')
+    const payload = {
+      app_id: editForm.value.app_id,
+      template_ids: selectedTemplateIds.value,
+      style_ids: selectedStyleIds.value
     }
 
-    const token = localStorage.getItem('accessToken')
-    const response = await fetch(`/dashboard/api/v1/templates/${editForm.value.id}`, {
+    const response = await fetch(`/dashboard/api/v1/applications/${editForm.value.id}`, {
       method: 'PUT',
-      body: formData,
       headers: {
+        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
-      }
+      },
+      body: JSON.stringify(payload)
     })
 
     if (!response.ok) {
@@ -320,30 +335,34 @@ const updateStyle = async () => {
         const refreshed = await userStore.refresh()
 
         if (refreshed) {
-          // Повторяем оригинальный запрос (например, через ту же функцию)
-          return await retryOriginalRequest()
+          // Повторяем оригинальный запрос
+          return await updateStyle()
         } else {
           // Обновление не удалось — разлогиниваем
           userStore.logout()
           router.push('/')
+          return
         }
       } else {
         // Обработка других ошибок
-        console.error('Ошибка запроса:', await response.json())
+        const errorData = await response.json()
+        console.error('Ошибка запроса:', errorData)
+        throw new Error(errorData.message || 'Failed to update application')
       }
     }
 
-    const updatedStyle = await response.json()
+    const updatedApplication = await response.json()
 
-    // Update the local data
-    const index = styles.value.findIndex(s => s.id === editForm.value.id)
+    // Обновляем локальные данные
+    const index = styles.value.findIndex(a => a.id === editForm.value.id)
     if (index !== -1) {
-      styles.value[index] = updatedStyle
+      styles.value[index] = updatedApplication
     }
 
     closeEditModal()
   } catch (error) {
-    console.error('Error updating style:', error)
+    console.error('Error updating application:', error)
+    // Здесь можно добавить отображение ошибки пользователю
   } finally {
     isUpdating.value = false
   }
@@ -359,11 +378,11 @@ const closeDeleteModal = () => {
   styleToDelete.value = null
 }
 
-const deleteStyle = async () => {
+const deleteApplication = async () => {
   isDeleting.value = true
   try {
     const token = localStorage.getItem('accessToken')
-    const response = await fetch(`/dashboard/api/v1/templates/${styleToDelete.value}`, {
+    const response = await fetch(`/dashboard/api/v1/applications/${styleToDelete.value}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -376,24 +395,27 @@ const deleteStyle = async () => {
         const refreshed = await userStore.refresh()
 
         if (refreshed) {
-          // Повторяем оригинальный запрос (например, через ту же функцию)
-          return await retryOriginalRequest()
+          // Повторяем оригинальный запрос
+          return await deleteApplication()
         } else {
           // Обновление не удалось — разлогиниваем
           userStore.logout()
           router.push('/')
+          return
         }
       } else {
         // Обработка других ошибок
         console.error('Ошибка запроса:', await response.json())
+        throw new Error('Failed to delete application')
       }
     }
 
-    // Remove the style from local data
-    styles.value = styles.value.filter(s => s.id !== styleToDelete.value)
+    // Удаляем приложение из локальных данных
+    styles.value = styles.value.filter(a => a.id !== styleToDelete.value)
     closeDeleteModal()
   } catch (error) {
-    console.error('Error deleting style:', error)
+    console.error('Error deleting application:', error)
+    // Здесь можно добавить отображение ошибки пользователю
   } finally {
     isDeleting.value = false
   }
@@ -401,16 +423,7 @@ const deleteStyle = async () => {
 
 onMounted(() => {
   fetchStyles()
+  fetchTemplates()
+  fetchStylesList()
 })
 </script>
-
-<style scoped>
-/* Add any additional styles here if needed */
-img {
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-img:hover {
-  transform: scale(1.05);
-}
-</style>
