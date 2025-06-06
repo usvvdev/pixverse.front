@@ -23,12 +23,18 @@ export const useAuthStore = defineStore('auth', {
       localStorage.clear()
     },
     async refresh() {
-      const res = await axios.post('/auth/api/v1/refresh',
-        { refresh_token: this.refreshToken }
-        // headers: { Authorization: `Bearer ${this.refreshToken}` }
-      )
-      this.accessToken = res.data.access_token
-      localStorage.setItem('accessToken', this.accessToken)
+      try {
+        const res = await axios.post('/auth/api/v1/refresh',
+          { refresh_token: this.refreshToken }
+        )
+        this.accessToken = res.data.access_token
+        localStorage.setItem('accessToken', this.accessToken)
+        return true // Успешное обновление
+      } catch (error) {
+        console.error('Refresh token failed:', error)
+        this.logout() // Очищаем хранилище при неудаче
+        return false
+      }
     }
   }
 })

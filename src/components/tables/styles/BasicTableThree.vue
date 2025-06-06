@@ -369,6 +369,7 @@ const updateStyle = async () => {
     }
 
     closeEditModal()
+    await fetchStyles()
   } catch (error) {
     console.error('Error updating style:', error)
   } finally {
@@ -419,6 +420,7 @@ const deleteStyle = async () => {
     // Remove the style from local data
     styles.value = styles.value.filter(s => s.id !== styleToDelete.value)
     closeDeleteModal()
+    await fetchStyles()
   } catch (error) {
     console.error('Error deleting style:', error)
   } finally {

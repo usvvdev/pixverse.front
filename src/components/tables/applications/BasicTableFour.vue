@@ -336,7 +336,7 @@ const updateStyle = async () => {
 
         if (refreshed) {
           // Повторяем оригинальный запрос
-          return await updateStyle()
+          return await updateStyle(true)
         } else {
           // Обновление не удалось — разлогиниваем
           userStore.logout()
@@ -360,6 +360,7 @@ const updateStyle = async () => {
     }
 
     closeEditModal()
+    await fetchStyles()
   } catch (error) {
     console.error('Error updating application:', error)
     // Здесь можно добавить отображение ошибки пользователю
@@ -413,6 +414,7 @@ const deleteApplication = async () => {
     // Удаляем приложение из локальных данных
     styles.value = styles.value.filter(a => a.id !== styleToDelete.value)
     closeDeleteModal()
+    await fetchStyles()
   } catch (error) {
     console.error('Error deleting application:', error)
     // Здесь можно добавить отображение ошибки пользователю

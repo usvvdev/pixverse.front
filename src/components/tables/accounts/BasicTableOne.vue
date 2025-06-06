@@ -202,7 +202,7 @@ const fetchAccounts = async () => {
 
         if (refreshed) {
           // Повторяем оригинальный запрос (например, через ту же функцию)
-          return await retryOriginalRequest()
+          return await fetchAccounts(true)
         } else {
           // Обновление не удалось — разлогиниваем
           userStore.logout()
@@ -255,7 +255,7 @@ const updateAccount = async () => {
 
         if (refreshed) {
           // Повторяем оригинальный запрос (например, через ту же функцию)
-          return await retryOriginalRequest()
+          return await updateAccount(true)
         } else {
           // Обновление не удалось — разлогиниваем
           userStore.logout()
@@ -274,6 +274,7 @@ const updateAccount = async () => {
     }
 
     closeEditModal()
+    await fetchAccounts()
   } catch (error) {
     console.error('Error updating account:', error)
   }
@@ -306,7 +307,7 @@ const deleteAccount = async () => {
 
         if (refreshed) {
           // Повторяем оригинальный запрос (например, через ту же функцию)
-          return await retryOriginalRequest()
+          return await deleteAccount(true)
         } else {
           // Обновление не удалось — разлогиниваем
           userStore.logout()
@@ -321,6 +322,7 @@ const deleteAccount = async () => {
     // Remove the account from local data
     accounts.value = accounts.value.filter(a => a.id !== accountToDelete.value)
     closeDeleteModal()
+    await fetchAccounts()
   } catch (error) {
     console.error('Error deleting account:', error)
   }
