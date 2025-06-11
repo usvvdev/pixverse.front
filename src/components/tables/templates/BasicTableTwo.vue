@@ -185,8 +185,8 @@
               >
               <div class="mt-1 flex items-center">
                 <video
-                  v-if="previewUrls.small"
-                  :src="previewUrls.small"
+                  v-if="previewUrls.small || editForm.preview_small"
+                  :src="previewUrls.small || editForm.preview_small"
                   class="h-20 w-20 rounded mr-4"
                   controls
                 ></video>
@@ -206,8 +206,8 @@
               >
               <div class="mt-1 flex items-center">
                 <video
-                  v-if="previewUrls.large"
-                  :src="previewUrls.large"
+                  v-if="previewUrls.large || editForm.preview_large"
+                  :src="previewUrls.large || editForm.preview_large"
                   class="h-20 w-20 rounded mr-4"
                   controls
                 ></video>
@@ -327,8 +327,8 @@ const editForm = ref({
   category: '',
   prompt: '',
   is_active: '',
-  previewSmallFile: null,
-  previewLargeFile: null,
+  preview_small: null,
+  preview_large: null,
 })
 
 const previewUrls = ref({
@@ -360,8 +360,8 @@ const openEditModal = (style) => {
     prompt: style.prompt,
     category: style.category,
     is_active: style.is_active,
-    previewSmallFile: style.previewSmallFile,
-    previewLargeFile: style.previewLargeFile,
+    preview_small: style.preview_small,
+    preview_large: style.preview_large,
   }
   showEditModal.value = true
 }
@@ -374,8 +374,8 @@ const closeEditModal = () => {
     prompt: '',
     category: '',
     is_active: '',
-    previewSmallFile: null,
-    previewLargeFile: null,
+    preview_small: null,
+    preview_large: null,
   }
 
   if (previewUrls.value.small) URL.revokeObjectURL(previewUrls.value.small)
@@ -394,10 +394,10 @@ const onVideoUpload = (event, size) => {
   const url = URL.createObjectURL(file)
 
   if (size === 'small') {
-    editForm.value.previewSmallFile = file
+    editForm.value.preview_small = file
     previewUrls.value.small = url
   } else {
-    editForm.value.previewLargeFile = file
+    editForm.value.preview_large = file
     previewUrls.value.large = url
   }
 }
@@ -418,12 +418,12 @@ const updateTemplate = async () => {
     // Формируем тело с файлами
     const formData = new FormData()
 
-    if (editForm.value.previewSmallFile) {
-      formData.append('preview_small', editForm.value.previewSmallFile)
+    if (editForm.value.preview_small) {
+      formData.append('preview_small', editForm.value.preview_small)
     }
 
-    if (editForm.value.previewLargeFile) {
-      formData.append('preview_large', editForm.value.previewLargeFile)
+    if (editForm.value.preview_large) {
+      formData.append('preview_large', editForm.value.preview_large)
     }
 
     const response = await fetch(`/dashboard/api/v1/templates/${editForm.value.id}?${query}`, {
