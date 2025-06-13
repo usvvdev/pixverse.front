@@ -19,8 +19,8 @@
         !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start',
       ]"
     >
-      <router-link to="/accounts">
-      <p class='text-xl font-semibold text-gray-800 dark:text-white/90'>Pixverse</p>
+      <router-link to="/main">
+      <p class='text-xl font-semibold text-gray-800 dark:text-white/90'>Admin Dashboard</p>
       </router-link>
     </div>
     <div
@@ -220,13 +220,21 @@ const menuGroups = [
     title: "Menu",
     items: [
       {
-        name: "Таблицы",
+        name: "Pixverse",
         icon: TableIcon,
         subItems: [
-          { name: "Аккаунты", path: "/accounts", pro: false },
-          { name: "Шаблоны", path: "/templates", pro: false },
-          { name: "Стили", path: "/styles", pro: false },
-          { name: "Приложения", path: "/applications", pro: false }
+          { name: "Аккаунты", path: "/pixverse/accounts", pro: false },
+          { name: "Шаблоны", path: "/pixverse/templates", pro: false },
+          { name: "Стили", path: "/pixverse/styles", pro: false },
+          { name: "Приложения", path: "/pixverse/applications", pro: false }
+        ],
+      },
+      {
+        name: "Photo Generator",
+        icon: TableIcon,
+        subItems: [
+          { name: "Шаблоны", path: "/photogenerator/templates", pro: false },
+          { name: "Приложения", path: "/photogenerator/applications", pro: false }
         ],
       },
     ],

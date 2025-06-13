@@ -33,6 +33,20 @@ export default defineConfig({
         ws: true,
         rewrite: (path) => path.replace(/^\/dashboard/, '/dashboard'),
       },
+      '/chatgpt': {
+        target: 'https://api-use-core.store/chatgpt/',
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+        rewrite: (path) => path.replace(/^\/chatgpt/, '/chatgpt'),
+      },
+      '/pixverse': {
+        target: 'https://api-use-core.store/pixverse/',
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+        rewrite: (path) => path.replace(/^\/pixverse/, '/pixverse'),
+      },
     },
   }
 })

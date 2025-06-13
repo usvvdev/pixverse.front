@@ -15,41 +15,81 @@ const router = createRouter({
       },
     },
     {
-      path: '/styles',
-      name: 'Стили',
-      component: () => import('../views/Tables/StyleTable.vue'),
+      path: '/main',
+      name: 'Главная',
+      component: () => import('../views/Pages/MainPage.vue'),
       meta: {
-        title: 'Стили',
+        title: 'Главная',
       },
     },
-
     {
-      path: '/templates',
-      name: 'Шаблоны',
-      component: () => import('../views/Tables/TemplateTable.vue'),
+      path: '/pixverse',
+      name: 'Pixverse API',
+      redirect: '/pixverse/accounts',
       meta: {
-        title: 'Шаблоны',
+        title: 'Pixverse',
       },
+      children: [
+        {
+          path: 'styles',
+          name: 'Стили Pixverse',
+          component: () => import('../views/Tables/pixverse/StyleTable.vue'),
+          meta: {
+            title: 'Стили Pixverse',
+          },
+        },
+        {
+          path: 'templates',
+          name: 'Шаблоны Pixverse',
+          component: () => import('../views/Tables/pixverse/TemplateTable.vue'),
+          meta: {
+            title: 'Шаблоны Pixverse',
+          },
+        },
+        {
+          path: 'accounts',
+          name: 'Аккаунты Pixverse',
+          component: () => import('../views/Tables/pixverse/AccountTable.vue'),
+          meta: {
+            title: 'Аккаунты Pixverse',
+          },
+        },
+        {
+          path: 'applications',
+          name: 'Приложения Pixverse',
+          component: () => import('../views/Tables/pixverse/ApplicationTable.vue'),
+          meta: {
+            title: 'Приложения Pixverse',
+          },
+        },
+      ]
     },
-
     {
-      path: '/accounts',
-      name: 'Аккаунты',
-      component: () => import('../views/Tables/AccountTable.vue'),
+      path: '/photogenerator',
+      name: 'Photo Generator API',
+      redirect: '/photogenerator/templates',
       meta: {
-        title: 'Аккаунты',
+        title: 'Photo Genrator',
       },
-    },
-
-    {
-      path: '/applications',
-      name: 'Приложения',
-      component: () => import('../views/Tables/ApplicationTable.vue'),
-      meta: {
-        title: 'Приложения',
-      },
-    },
-
+      children: [
+        {
+          path: 'templates',
+          name: 'Шаблоны Photo Genrator',
+          component: () => import('../views/Tables/photogenerator/TemplateTable.vue'),
+          meta: {
+            title: 'Шаблоны Photo Genrator',
+          },
+        },
+        {
+          path: 'applications',
+          name: 'Приложения Photo Genrator',
+          component: () => import('../views/Tables/photogenerator/ApplicationTable.vue'),
+          meta: {
+            title: 'Приложения Photo Genrator',
+          },
+        },
+      ]
+    }
   ],
 })
 
