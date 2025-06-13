@@ -92,13 +92,11 @@
                 }"
               >
                 <div class="flex items-start space-x-3">
-                  <video
+                  <img
                     :src="template.preview_small"
                     class="h-12 w-12 rounded flex-shrink-0 object-cover"
-                    muted
-                    loop
-                    autoplay
-                  ></video>
+                    alt="Template preview"
+                  />
                   <div>
                     <h4 class="text-sm font-medium text-gray-900 dark:text-white">{{ template.name }}</h4>
                     <p class="text-xs text-gray-500 dark:text-gray-400">{{ template.category }}</p>
@@ -109,7 +107,7 @@
           </div>
 
           <!-- Styles Selection -->
-          <div>
+          <!-- <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Стили</label>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-44 overflow-y-auto p-2">
               <div
@@ -123,20 +121,18 @@
                 }"
               >
                 <div class="flex items-start space-x-3">
-                  <video
+                  <img
                     :src="style.preview_small"
                     class="h-12 w-12 rounded flex-shrink-0 object-cover"
-                    muted
-                    loop
-                    autoplay
-                  ></video>
+                    alt="Style preview"
+                  />
                   <div>
                     <h4 class="text-sm font-medium text-gray-900 dark:text-white">{{ style.name }}</h4>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
 
         <div class="mt-6 flex justify-end space-x-3">
@@ -218,7 +214,7 @@ const editForm = ref({
   id: null,
   app_id: '',
   template_ids: [],
-  style_ids: []
+  // style_ids: []
 })
 const previewImage = ref(null)
 const newImage = ref(null)
@@ -229,7 +225,7 @@ const isDeleting = ref(false)
 const availableTemplates = ref([])
 const availableStyles = ref([])
 const selectedTemplateIds = ref([])
-const selectedStyleIds = ref([])
+// const selectedStyleIds = ref([])
 
 const userStore = useAuthStore()
 
@@ -264,12 +260,12 @@ const openEditModal = (application) => {
     id: application.id,
     app_id: application.app_id,
     template_ids: application.templates ? application.templates.map(t => t.id) : [],
-    style_ids: application.styles ? application.styles.map(s => s.id) : []
+    // style_ids: application.styles ? application.styles.map(s => s.id) : []
   }
 
   // Устанавливаем выбранные ID
   selectedTemplateIds.value = [...editForm.value.template_ids]
-  selectedStyleIds.value = [...editForm.value.style_ids]
+  // selectedStyleIds.value = [...editForm.value.style_ids]
 
   showEditModal.value = true
 }
@@ -277,7 +273,7 @@ const openEditModal = (application) => {
 const closeEditModal = () => {
   showEditModal.value = false
   selectedTemplateIds.value = []
-  selectedStyleIds.value = []
+  // selectedStyleIds.value = []
 }
 
 const toggleTemplateSelection = (id) => {
@@ -289,14 +285,14 @@ const toggleTemplateSelection = (id) => {
   }
 }
 
-const toggleStyleSelection = (id) => {
-  const index = selectedStyleIds.value.indexOf(id)
-  if (index === -1) {
-    selectedStyleIds.value.push(id)
-  } else {
-    selectedStyleIds.value.splice(index, 1)
-  }
-}
+// const toggleStyleSelection = (id) => {
+//   const index = selectedStyleIds.value.indexOf(id)
+//   if (index === -1) {
+//     selectedStyleIds.value.push(id)
+//   } else {
+//     selectedStyleIds.value.splice(index, 1)
+//   }
+// }
 
 const updateStyle = async () => {
   isUpdating.value = true
@@ -305,7 +301,7 @@ const updateStyle = async () => {
     const payload = {
       app_id: editForm.value.app_id,
       template_ids: selectedTemplateIds.value,
-      style_ids: selectedStyleIds.value
+      style_ids: []
     }
 
     const response = await fetch(`/chatgpt/api/v1/applications/${editForm.value.id}`, {
@@ -414,6 +410,6 @@ const deleteApplication = async () => {
 onMounted(() => {
   fetchStyles()
   fetchTemplates()
-  fetchStylesList()
+  // fetchStylesList()
 })
 </script>
