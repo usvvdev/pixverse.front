@@ -223,10 +223,10 @@ const menuGroups = [
         name: "Pixverse",
         icon: TableIcon,
         subItems: [
-          { name: "Аккаунты", path: "/pixverse/accounts", pro: false },
-          { name: "Шаблоны", path: "/pixverse/templates", pro: false },
-          { name: "Стили", path: "/pixverse/styles", pro: false },
-          { name: "Приложения", path: "/pixverse/applications", pro: false }
+          { name: "Аккаунты", path: "/pix/accounts", pro: false },
+          { name: "Шаблоны", path: "/pix/templates", pro: false },
+          { name: "Стили", path: "/pix/styles", pro: false },
+          { name: "Приложения", path: "/pix/applications", pro: false }
         ],
       },
       {

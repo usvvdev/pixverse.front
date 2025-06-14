@@ -23,7 +23,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/pixverse',
+      path: '/pix',
       name: 'Pixverse API',
       redirect: '/pixverse/accounts',
       meta: {
