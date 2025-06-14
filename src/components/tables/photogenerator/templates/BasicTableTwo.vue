@@ -418,11 +418,11 @@ const updateTemplate = async () => {
     // Формируем тело с файлами
     const formData = new FormData()
 
-    if (editForm.value.preview_small) {
+    if (editForm.value.preview_small instanceof File) {
       formData.append('preview_small', editForm.value.preview_small)
     }
 
-    if (editForm.value.preview_large) {
+    if (editForm.value.preview_large instanceof File) {
       formData.append('preview_large', editForm.value.preview_large)
     }
 
