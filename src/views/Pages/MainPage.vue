@@ -76,7 +76,7 @@ export default defineComponent({
         id: 'pixverse',
         name: 'Pixverse',
         description: 'Service for Pixverse API',
-        route: '/pixverse'
+        route: '/pix'
       },
       {
         id: 'photo-generator',
