@@ -89,7 +89,15 @@ const router = createRouter({
           },
         },
       ]
-    }
+    },
+    {
+      path: '/statistics',
+      name: 'Cтатистика пользователей',
+      component: () => import('../views/Tables/statistics/StatsTable.vue'),
+      meta: {
+        title: 'Cтатистика пользователей',
+      },
+    },
   ],
 })
 

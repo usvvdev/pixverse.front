@@ -237,6 +237,12 @@ const menuGroups = [
           { name: "Приложения", path: "/photogenerator/applications", pro: false }
         ],
       },
+      {
+        name: "Статитиска пользователей",
+        icon: TableIcon,
+        path: "/statistics",
+        pro: false
+      },
     ],
   },
 ];
