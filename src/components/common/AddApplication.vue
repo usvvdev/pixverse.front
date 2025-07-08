@@ -16,6 +16,11 @@
         </div>
 
         <div>
+          <label class="label">Описание приложения</label>
+          <input v-model="form.description" class="input" placeholder="Описание приложения" required />
+        </div>
+
+        <div>
           <label class="label">Регион размещения</label>
           <input v-model="form.region" class="input" placeholder="Напр. US, EU, RU" />
         </div>
@@ -23,11 +28,6 @@
         <div>
           <label class="label">Регион App Store</label>
           <input v-model="form.storeRegion" class="input" />
-        </div>
-
-        <div>
-          <label class="label">Менеджер</label>
-          <input v-model="form.manager" class="input" />
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -38,14 +38,6 @@
           <div>
             <label class="label">Категория</label>
             <input v-model="form.category" class="input" />
-          </div>
-          <div>
-            <label class="label">Платформа</label>
-            <input v-model="form.platform" class="input" />
-          </div>
-          <div>
-            <label class="label">Поставщик</label>
-            <input v-model="form.supplier" class="input" />
           </div>
         </div>
 
@@ -96,6 +88,7 @@ interface Application {
   id?: string
   name: string
   application_id: string
+  description: string
   region?: string
   storeRegion?: string
   manager?: string
@@ -121,6 +114,7 @@ const emit = defineEmits(['update:modelValue', 'close', 'save'])
 const form = reactive<Application>({
   id: '',
   application_id: '',
+  description: '',
   name: '',
   region: '',
   storeRegion: '',

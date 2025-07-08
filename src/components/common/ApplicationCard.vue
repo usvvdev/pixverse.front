@@ -2,9 +2,7 @@
 defineProps<{
   application_id: string
   name: string
-  status: string
   description?: string | unknown
-  apis: string[]
 }>()
 </script>
 
@@ -12,20 +10,13 @@ defineProps<{
   <div class="card">
     <div class="card-header">
       <h2 class="app-name" :title="name">{{ name }}</h2>
-      <span v-if="status === 'testing'" class="badge-testing">Тестирование</span>
     </div>
 
     <p class="app-description">
       {{ description || 'Описание недоступно' }}
     </p>
 
-    <div class="apis-section">
-      <p class="apis-title">Подключенные API:</p>
-      <div v-if="apis.length" class="apis-list">
-        <span v-for="api in apis" :key="api" class="api-badge">{{ api }}</span>
-      </div>
-      <p v-else class="no-apis">Нет подключенных API</p>
-    </div>
+
 
     <div class="app-id-section">
       <p class="app-id-label">ID приложения:</p>
