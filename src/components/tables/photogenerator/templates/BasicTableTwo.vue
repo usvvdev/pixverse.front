@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
-  >
+  <div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
     <div class="max-w-full overflow-x-auto custom-scrollbar">
       <table class="min-w-full">
         <thead>
@@ -31,92 +29,80 @@
         </thead>
         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
           <tr
-            v-for="(style, index) in styles"
+            v-for="(style, index) in paginatedStyles"
             :key="index"
+            :ref="(el) => el && observeRowVisibility(el, index)"
             class="border-t border-gray-100 dark:border-gray-800"
           >
-            <td class="px-5 py-4 sm:px-6">
-              <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                {{ style.id }}
-              </span>
+            <!-- Скелетон-плейсхолдер, если ещё не виден -->
+            <td v-show="!visibleRows[index]" colspan="7" class="px-5 py-4 sm:px-6">
+              <div class="h-[150px] animate-pulse bg-gray-100 dark:bg-gray-700 rounded-xl"></div>
             </td>
-            <td class="px-5 py-4 sm:px-6">
-              <img
-                v-if="style.preview_small"
-                :src="style.preview_small"
-                class="max-w-[150px] rounded"
-                alt="Preview"
-              />
-            </td>
-            <td class="px-5 py-4 sm:px-6">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ style.category }}</p>
-            </td>
-            <td class="px-5 py-4 sm:px-6">
-              <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ style.name }}</p>
-            </td>
-            <td class="px-5 py-4 sm:px-6 max-w-[200px]">
-              <p
-                class="text-gray-500 text-theme-sm dark:text-gray-400 truncate whitespace-nowrap overflow-hidden"
-              >
-                {{ style.prompt }}
-              </p>
-            </td>
-            <td class="px-5 py-4 sm:px-6">
-              <span
-                :class="[
-                  'rounded-full px-2 py-0.5 text-theme-xs font-medium',
-                  {
-                    'bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-500':
-                      style.is_active,
-                    'bg-error-50 text-error-700 dark:bg-error-500/15 dark:text-error-500':
-                      !style.is_active,
-                  },
-                ]"
-              >
-                {{ style.is_active ? 'Активный' : 'Инактивный' }}
-              </span>
-            </td>
-            <td class="px-5 py-4 sm:px-6">
-              <div class="flex items-center space-x-2">
-                <button
-                  @click="openEditModal(style)"
-                  class="p-1 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
+              <template v-if="visibleRows[index]">
+                <td class="px-5 py-4 sm:px-6">
+                  <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">{{ style.id }}</span>
+                </td>
+                <td class="px-5 py-4 sm:px-6">
+                  <div
+                    class="w-[100px] h-[150px] rounded overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center"
+                    :ref="(el) => el && observeVisibility(el, index)"
                   >
-                    <path
-                      d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+                    <img
+                      v-if="visibleVideos[index] && style.preview_small"
+                      :src="style.preview_small"
+                      preload="metadata"
+                      class="w-full h-full object-contain rounded opacity-0 transition-opacity duration-500"
+                      @load="(e) => e.target.classList.add('opacity-100')"
                     />
-                  </svg>
-                </button>
-                <button
-                  @click="confirmDelete(style.id)"
-                  class="p-1 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
+                    <div v-else class="animate-pulse w-full h-full bg-gray-200 dark:bg-gray-600 rounded"></div>
+                  </div>
+                </td>
+                <td class="px-5 py-4 sm:px-6">
+                  <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ style.category }}</p>
+                </td>
+                <td class="px-5 py-4 sm:px-6">
+                  <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ style.name }}</p>
+                </td>
+                <td class="px-5 py-4 sm:px-6 max-w-[200px]">
+                  <p class="text-gray-500 text-theme-sm dark:text-gray-400 truncate whitespace-nowrap overflow-hidden">
+                    {{ style.prompt }}
+                  </p>
+                </td>
+                <td class="px-5 py-4 sm:px-6">
+                  <span
+                    :class="[
+                      'rounded-full px-2 py-0.5 text-theme-xs font-medium',
+                      style.is_active
+                        ? 'bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-500'
+                        : 'bg-error-50 text-error-700 dark:bg-error-500/15 dark:text-error-500',
+                    ]"
                   >
-                    <path
-                      fill-rule="evenodd"
-                      d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </td>
-          </tr>
+                    {{ style.is_active ? 'Активный' : 'Инактивный' }}
+                  </span>
+                </td>
+                <td class="px-5 py-4 sm:px-6">
+                  <div class="flex items-center space-x-2">
+                    <button @click="openEditModal(style)" class="p-1 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400">
+                      <!-- Edit icon -->
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                      </svg>
+                    </button>
+                    <button @click="confirmDelete(style.id)" class="p-1 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400">
+                      <!-- Delete icon -->
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </template>
+            </tr>
         </tbody>
       </table>
     </div>
   </div>
+
 
   <!-- Edit Modal -->
   <div v-if="showEditModal" class="fixed inset-0 z-50 overflow-y-auto">
@@ -178,7 +164,7 @@
               </select>
             </div>
 
-            <!-- Image small -->
+            <!-- Video small -->
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300"
                 >Preview Small</label
@@ -188,18 +174,18 @@
                   v-if="previewUrls.small || editForm.preview_small"
                   :src="previewUrls.small || editForm.preview_small"
                   class="h-20 w-20 rounded mr-4"
-                  alt="Preview Small"
+                  controls
                 />
                 <input
                   type="file"
                   accept="image/*"
-                  @change="onImageUpload($event, 'small')"
+                  @change="onVideoUpload($event, 'small')"
                   class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-300"
                 />
               </div>
             </div>
 
-            <!-- Image large -->
+            <!-- Video large -->
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300"
                 >Preview Large</label
@@ -209,12 +195,12 @@
                   v-if="previewUrls.large || editForm.preview_large"
                   :src="previewUrls.large || editForm.preview_large"
                   class="h-20 w-20 rounded mr-4"
-                  alt="Preview Large"
+                  controls
                 />
                 <input
                   type="file"
                   accept="image/*"
-                  @change="onImageUpload($event, 'large')"
+                  @change="onVideoUpload($event, 'large')"
                   class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-300"
                 />
               </div>
@@ -309,17 +295,81 @@
       </div>
     </div>
   </div>
+
+  <!-- Пагинация -->
+<div class="flex flex-col sm:flex-row justify-between items-center mt-6 px-4 gap-4">
+  <!-- Текст с текущей страницей -->
+  <div class="text-sm text-gray-600 dark:text-gray-400">
+    Страница <span class="font-semibold">{{ currentPage }}</span> из <span class="font-semibold">{{ totalPages }}</span>
+  </div>
+
+  <!-- Кнопки пагинации -->
+  <nav class="inline-flex space-x-1 rounded-md shadow-sm" role="navigation" aria-label="Pagination">
+    <button
+      @click="currentPage--"
+      :disabled="currentPage === 1"
+      class="relative inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-l-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      ←
+    </button>
+
+    <template v-for="page in visiblePages" :key="page">
+      <button
+        @click="currentPage = page"
+        :class="[
+          'inline-flex items-center px-3 py-1.5 text-sm font-medium border',
+          currentPage === page
+            ? 'bg-blue-500 text-white border-blue-500'
+            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700',
+        ]"
+      >
+        {{ page }}
+      </button>
+    </template>
+
+    <button
+      @click="currentPage++"
+      :disabled="currentPage === totalPages"
+      class="relative inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-r-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      →
+    </button>
+  </nav>
+</div>
+
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup lang="ts">
+import { ref, onMounted, computed, watch} from 'vue'
+import { useIntersectionObserver } from '@vueuse/core'
 
 import { useAuthStore } from '@/stores/auth'
 
+const intersecting = ref({})
 const styles = ref([])
+const paginatedStyles = ref([])
+const currentPage = ref(1)
+const pageSize = 30
+
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
 const styleToDelete = ref(null)
+
+const visibleVideos = ref<Record<number, boolean>>({})
+
+// Функция, которая следит за появлением
+const observeVisibility = (el: Element, index: number) => {
+  const { stop } = useIntersectionObserver(
+    el,
+    ([{ isIntersecting }]) => {
+      if (isIntersecting) {
+        visibleVideos.value[index] = true
+        stop()
+      }
+    },
+    { threshold: 0.1 },
+  )
+}
 
 const editForm = ref({
   id: null,
@@ -339,19 +389,62 @@ const previewUrls = ref({
 const isUpdating = ref(false)
 const isDeleting = ref(false)
 
+const visibleRows = ref({})
+
+const observeRowVisibility = (el: Element, index: number) => {
+  const { stop } = useIntersectionObserver(
+    el,
+    ([{ isIntersecting }]) => {
+      if (isIntersecting) {
+        visibleRows.value[index] = true
+        stop()
+        checkVideoVisibilitySequential()
+      }
+    },
+    { threshold: 0.1 },
+  )
+}
+
+// Функция для поочередного включения видео
+function checkVideoVisibilitySequential() {
+  // Идём по индексам в порядке, включаем видео, если строка видна и либо первая строка, либо предыдущий видео тоже видно
+  for (let i = 0; i < paginatedStyles.value.length; i++) {
+    if (visibleRows.value[i]) {
+      if (i === 0) {
+        visibleVideos.value[i] = true
+      } else if (visibleVideos.value[i - 1]) {
+        visibleVideos.value[i] = true
+      } else {
+        // Предыдущее видео не загружено — остановить включение текущего видео
+        break
+      }
+    }
+  }
+}
+
 const userStore = useAuthStore()
+
+const totalPages = computed(() => Math.ceil(styles.value.length / pageSize))
 
 const fetchStyles = async () => {
   try {
     const response = await fetch('/chatgpt/api/v1/templates')
-    if (!response.ok) {
-      throw new Error('Failed to fetch templates')
-    }
-    styles.value = await response.json()
-  } catch (error) {
-    console.error('Error fetching templates:', error)
+    if (!response.ok) throw new Error('Ошибка загрузки шаблонов')
+
+    const data = await response.json()
+    styles.value = data
+  } catch (err) {
+    console.error(err)
   }
 }
+
+const paginateStyles = () => {
+  const start = (currentPage.value - 1) * pageSize
+  const end = start + pageSize
+  paginatedStyles.value = styles.value.slice(start, end)
+}
+
+watch([styles, currentPage], paginateStyles)
 
 const openEditModal = (style) => {
   editForm.value = {
@@ -387,7 +480,7 @@ const closeEditModal = () => {
   }
 }
 
-const onImageUpload = (event, size) => {
+const onVideoUpload = (event, size) => {
   const file = event.target.files?.[0]
   if (!file) return
 
@@ -534,5 +627,8 @@ img {
 }
 img:hover {
   transform: scale(1.05);
+}
+img {
+  transition: opacity 0.3s ease-in-out;
 }
 </style>

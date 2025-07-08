@@ -1,5 +1,24 @@
 <template>
   <div class="min-h-screen bg-white dark:bg-gray-900">
+    <nav class="border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex gap-6">
+        <RouterLink
+          to="/main"
+          class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white"
+          active-class="text-blue-600 dark:text-white font-semibold underline underline-offset-4"
+        >
+          Главная
+        </RouterLink>
+        <RouterLink
+          to="/applications"
+          class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white"
+          active-class="text-blue-600 dark:text-white font-semibold underline underline-offset-4"
+        >
+          Приложения
+        </RouterLink>
+      </div>
+    </nav>
+
     <!-- Header -->
     <header class="border-b border-gray-100 dark:border-gray-800">
       <div class="max-w-7xl mx-auto px-4 py-6">
@@ -55,6 +74,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { RouterLink } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 
 interface Service {

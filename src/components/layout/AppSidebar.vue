@@ -19,8 +19,26 @@
         !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start',
       ]"
     >
-      <router-link to="/main">
-      <p class='text-xl font-semibold text-gray-800 dark:text-white/90'>Admin Dashboard</p>
+      <router-link to="/main" class="flex items-center px-4 py-4 space-x-2">
+        <!-- Иконка (всегда показывается) -->
+        <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-6 w-6 text-gray-800 dark:text-white"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+    >
+      <path
+        d="M10 2C5.58 2 2 5.58 2 10s3.58 8 8 8c.34 0 .68-.02 1.01-.07A5.978 5.978 0 0 0 10 14c0-3.31 2.69-6 6-6 .48 0 .94.06 1.38.17A8.015 8.015 0 0 0 10 2zm4 8c-2.21 0-4 1.79-4 4 0 1.3.62 2.45 1.58 3.2.1.08.2.15.3.22.54.33 1.15.58 1.78.72.45.09.92.14 1.4.14 3.31 0 6-2.69 6-6s-2.69-6-6-6z"
+      />
+    </svg>
+
+        <!-- Текст (отображается только при isExpanded) -->
+        <span
+          v-show="isExpanded || isHovered || isMobileOpen"
+          class="text-60px font-semibold text-gray-800 dark:text-white whitespace-nowrap transition-opacity duration-300"
+        >
+          Admin Dashboard
+        </span>
       </router-link>
     </div>
     <div

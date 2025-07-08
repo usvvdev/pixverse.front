@@ -20,28 +20,28 @@ export default defineConfig({
   server: {
     proxy: {
       '/auth': {
-        target: 'https://api-use-core.store/auth/',
+        target: 'https://trust.coreapis.space/auth/',
         changeOrigin: true,
         secure: false,
         ws: true,
         rewrite: (path) => path.replace(/^\/auth/, '/auth'),
       },
       '/dashboard': {
-        target: 'https://api-use-core.store/dashboard/',
+        target: 'https://trust.coreapis.space/dashboard/',
         changeOrigin: true,
         secure: false,
         ws: true,
         rewrite: (path) => path.replace(/^\/dashboard/, '/dashboard'),
       },
       '/chatgpt': {
-        target: 'https://api-use-core.store/chatgpt/',
+        target: 'https://trust.coreapis.space/chatgpt/',
         changeOrigin: true,
         secure: false,
         ws: true,
         rewrite: (path) => path.replace(/^\/chatgpt/, '/chatgpt'),
       },
       '/pixverse': {
-        target: 'https://api-use-core.store/pixverse/',
+        target: 'https://trust.coreapis.space/pixverse/',
         changeOrigin: true,
         secure: false,
         ws: true,

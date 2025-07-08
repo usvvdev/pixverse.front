@@ -23,6 +23,14 @@ const router = createRouter({
       },
     },
     {
+      path: '/applications',
+      name: 'Приложения',
+      component: () => import('../views/Pages/ApplicationPage.vue'),
+      meta: {
+        title: 'Приложения',
+      },
+    },
+    {
       path: '/pix',
       name: 'Pixverse API',
       redirect: '/pix/accounts',
