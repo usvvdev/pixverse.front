@@ -5,7 +5,8 @@ import Card from '@/components/common/ApplicationCard.vue'
 import AddApplication from '@/components/common/AddApplication.vue'
 
 interface Application {
-  id: string
+  id: number
+  application_id: string
   name: string
   description: string
   status: string
@@ -15,21 +16,24 @@ interface Application {
 
 const apps = ref<Application[]>([
   {
-    id: '85e3faee-cbff-4cfc-88d9-6725a27692de',
+    id: 1,
+    application_id: '85e3faee-cbff-4cfc-88d9-6725a27692de',
     name: 'Pixverse',
     description: 'Мобильное приложение для iOS',
     status: 'testing',
     apis: ['Video Generation'],
   },
   {
-    id: 'dbfca46c-b51f-4614-be41-0b46999ce054',
+    id: 2,
+    application_id: 'dbfca46c-b51f-4614-be41-0b46999ce054',
     name: 'Photo Generator | ToyBox',
     description: '',
     status: 'testing',
     apis: ['Video Generation', '999'],
   },
   {
-    id: 'dbfcf46c-b51f-1614-be41-0b43299ce054',
+    id: 3,
+    application_id: 'dbfcf46c-b51f-1614-be41-0b43299ce054',
     name: 'CalZen',
     description: '',
     status: 'testing',
@@ -122,7 +126,7 @@ function saveApplication(app: Application) {
         <Card
           v-for="app in apps"
           :key="app.id"
-          :id="app.id"
+          :application_id="app.application_id"
           :name="app.name"
           :status="app.status"
           :description="app.description"

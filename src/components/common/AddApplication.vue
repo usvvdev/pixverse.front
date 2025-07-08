@@ -11,6 +11,11 @@
         </div>
 
         <div>
+          <label class="label">ID приложения</label>
+          <input v-model="form.application_id" class="input" placeholder="ID приложения" required />
+        </div>
+
+        <div>
           <label class="label">Регион размещения</label>
           <input v-model="form.region" class="input" placeholder="Напр. US, EU, RU" />
         </div>
@@ -67,22 +72,8 @@
             <option>Native</option>
             <option>Flutter</option>
             <option>React Native</option>
+            <option>Swift</option>
           </select>
-        </div>
-
-        <div>
-          <label class="label">Бренд</label>
-          <input v-model="form.brand" class="input" />
-        </div>
-
-        <div>
-          <label class="label">Разработчик</label>
-          <input v-model="form.developer" class="input" />
-        </div>
-
-        <div>
-          <label class="label">Страна</label>
-          <input v-model="form.country" class="input" />
         </div>
 
         <div class="pt-4 flex justify-end gap-3">
@@ -99,11 +90,12 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, toRefs, watch, defineProps, defineEmits } from 'vue'
+import { reactive, watch, defineProps, defineEmits } from 'vue'
 
 interface Application {
   id?: string
   name: string
+  application_id: string
   region?: string
   storeRegion?: string
   manager?: string
@@ -128,6 +120,7 @@ const emit = defineEmits(['update:modelValue', 'close', 'save'])
 
 const form = reactive<Application>({
   id: '',
+  application_id: '',
   name: '',
   region: '',
   storeRegion: '',

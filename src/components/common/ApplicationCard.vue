@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineProps<{
-  id: string
+  application_id: string
   name: string
   status: string
   description?: string | unknown
@@ -29,7 +29,7 @@ defineProps<{
 
     <div class="app-id-section">
       <p class="app-id-label">ID приложения:</p>
-      <div class="app-id">{{ id }}</div>
+      <div class="app-id">{{ application_id }}</div>
     </div>
 
     <button class="btn-primary btn-manage">Управление</button>
