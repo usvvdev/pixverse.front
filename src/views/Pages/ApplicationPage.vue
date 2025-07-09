@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import Card from '@/components/common/ApplicationCard.vue'
 import AddApplication from '@/components/common/AddApplication.vue'
@@ -9,32 +9,89 @@ interface Application {
   application_id: string
   name: string
   description: string
-  // доп. поля для формы можно добавить при необходимости
+  region?: string
+  store_region?: string
+  application_number?: string
+  category?: string
+  start_date?: string
+  release_date?: string
+  technology?: string
 }
 
-const apps = ref<Application[]>([
-  {
-    id: 1,
-    application_id: '85e3faee-cbff-4cfc-88d9-6725a27692de',
-    name: 'Pixverse',
-    description: 'Мобильное приложение для iOS',
-  },
-  {
-    id: 2,
-    application_id: 'dbfca46c-b51f-4614-be41-0b46999ce054',
-    name: 'Photo Generator | ToyBox',
-    description: '',
-  },
-  {
-    id: 3,
-    application_id: 'dbfcf46c-b51f-1614-be41-0b43299ce054',
-    name: 'CalZen',
-    description: '',
-  },
-])
-
+const apps = ref<Application[]>([])
 const showModal = ref(false)
 const editableApp = ref<Application | null>(null)
+
+const fetchApps = async () => {
+  try {
+    const token = localStorage.getItem('accessToken')
+    const response = await fetch('/dashboard/api/v1/store_applications', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+
+    if (!response.ok) throw new Error('Ошибка загрузки приложений')
+
+    const data = await response.json()
+    apps.value = data
+  } catch (err) {
+    console.error('Ошибка при получении приложений:', err)
+  }
+}
+
+const addApplication = async (app: Application) => {
+  const token = localStorage.getItem('accessToken')
+
+  const response = await fetch('/dashboard/api/v1/store_applications', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(app),
+  })
+
+  if (!response.ok) throw new Error('Ошибка при создании приложения')
+
+  const newApp = await response.json()
+  apps.value.push(newApp)
+}
+
+const updateApplication = async (app: Application) => {
+  const token = localStorage.getItem('accessToken')
+
+  const response = await fetch(`/dashboard/api/v1/store_applications/${app.id}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(app),
+  })
+
+  if (!response.ok) throw new Error('Ошибка при обновлении приложения')
+
+  const updated = await response.json()
+  const index = apps.value.findIndex((a) => a.id === app.id)
+  if (index !== -1) apps.value[index] = updated
+}
+
+const handleDelete = async (appId: number) => {
+  const token = localStorage.getItem('accessToken')
+
+  const response = await fetch(`/dashboard/api/v1/store_applications/${appId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+
+  if (!response.ok) throw new Error('Ошибка при удалении приложения')
+
+  apps.value = apps.value.filter((a) => a.id !== appId)
+
+  await fetchApps()
+  closeModal()
+}
 
 function openAdd() {
   editableApp.value = null
@@ -42,7 +99,7 @@ function openAdd() {
 }
 
 function openEdit(app: Application) {
-  editableApp.value = app
+  editableApp.value = { ...app }
   showModal.value = true
 }
 
@@ -51,21 +108,23 @@ function closeModal() {
   editableApp.value = null
 }
 
-function saveApplication(app: Application) {
-  if (app.id) {
-    // редактирование
-    const index = apps.value.findIndex((a) => a.id === app.id)
-    if (index !== -1) {
-      apps.value[index] = { ...apps.value[index], ...app }
+async function saveApplication(app: Application) {
+  try {
+    if (app.id) {
+      await updateApplication(app)
+    } else {
+      await addApplication(app)
     }
-  } else {
-    // добавление нового
-    app.id = crypto.randomUUID()
-    apps.value.push(app)
+    await fetchApps()
+    closeModal()
+  } catch (err) {
+    console.error('Ошибка сохранения:', err)
   }
-  closeModal()
 }
+
+onMounted(fetchApps)
 </script>
+
 
 <template>
   <div class="min-h-screen bg-white dark:bg-gray-900">
@@ -134,6 +193,7 @@ function saveApplication(app: Application) {
       @update:modelValue="val => (editableApp = val)"
       @close="closeModal"
       @save="saveApplication"
+      @delete="handleDelete"
     />
   </div>
 </template>

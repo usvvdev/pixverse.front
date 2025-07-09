@@ -27,13 +27,13 @@
 
         <div>
           <label class="label">Регион App Store</label>
-          <input v-model="form.storeRegion" class="input" />
+          <input v-model="form.store_region" class="input" />
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="label">Номер</label>
-            <input v-model="form.number" class="input" />
+            <input v-model="form.application_number" class="input" />
           </div>
           <div>
             <label class="label">Категория</label>
@@ -44,17 +44,12 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="label">Дата начала</label>
-            <input type="date" v-model="form.startDate" class="input" />
+            <input type="date" v-model="form.start_date" class="input" />
           </div>
           <div>
             <label class="label">Дата релиза</label>
-            <input type="date" v-model="form.releaseDate" class="input" />
+            <input type="date" v-model="form.release_date" class="input" />
           </div>
-        </div>
-
-        <div>
-          <label class="label">Компания (разработчик)</label>
-          <input v-model="form.developerCompany" class="input" />
         </div>
 
         <div>
@@ -65,16 +60,35 @@
             <option>Flutter</option>
             <option>React Native</option>
             <option>Swift</option>
+            <option>Python</option>
           </select>
         </div>
 
-        <div class="pt-4 flex justify-end gap-3">
-          <button type="button" @click="$emit('close')" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600">
-            Отмена
-          </button>
-          <button type="submit" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">
-            Сохранить
-          </button>
+        <div class="pt-4 flex justify-between flex-wrap gap-3">
+          <div v-if="isEdit">
+            <button
+              type="button"
+              @click="handleDelete"
+              class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
+            >
+              Удалить
+            </button>
+          </div>
+          <div class="flex gap-3 ml-auto">
+            <button
+              type="button"
+              @click="$emit('close')"
+              class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
+            >
+              Отмена
+            </button>
+            <button
+              type="submit"
+              class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+            >
+              Сохранить
+            </button>
+          </div>
         </div>
       </form>
     </div>
@@ -90,26 +104,25 @@ interface Application {
   application_id: string
   description: string
   region?: string
-  storeRegion?: string
-  manager?: string
-  number?: string
+  store_region?: string
+  application_number?: string
   category?: string
-  platform?: string
-  supplier?: string
-  startDate?: string
-  releaseDate?: string
-  developerCompany?: string
+  start_date?: string
+  release_date?: string
   technology?: string
-  brand?: string
-  developer?: string
-  country?: string
+}
+
+const handleDelete = () => {
+  if (form.id) {
+    emit('delete', form.id)
+  }
 }
 
 const props = defineProps<{
   modelValue: Application | null
 }>()
 
-const emit = defineEmits(['update:modelValue', 'close', 'save'])
+const emit = defineEmits(['update:modelValue', 'close', 'save', 'delete'])
 
 const form = reactive<Application>({
   id: '',
@@ -117,19 +130,12 @@ const form = reactive<Application>({
   description: '',
   name: '',
   region: '',
-  storeRegion: '',
-  manager: '',
-  number: '',
+  store_region: '',
+  application_number: '',
   category: '',
-  platform: '',
-  supplier: '',
-  startDate: '',
-  releaseDate: '',
-  developerCompany: '',
+  start_date: '',
+  release_date: '',
   technology: '',
-  brand: '',
-  developer: '',
-  country: '',
 })
 
 const isEdit = !!props.modelValue
@@ -139,9 +145,12 @@ watch(
   () => props.modelValue,
   (val) => {
     if (val) {
-      Object.assign(form, val)
+      Object.assign(form, {
+        ...val,
+        start_date: val.start_date?.slice(0, 10) ?? '',
+        release_date: val.release_date?.slice(0, 10) ?? '',
+      })
     } else {
-      // если null — сброс
       Object.keys(form).forEach((k) => {
         // @ts-ignore
         form[k] = ''
