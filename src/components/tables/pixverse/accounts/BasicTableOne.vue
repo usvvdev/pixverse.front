@@ -169,6 +169,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const accounts = ref([])
@@ -183,10 +184,27 @@ const editForm = ref({
   balance: 0
 })
 
+const router = useRouter()
 const userStore = useAuthStore()
 
-const fetchAccounts = async () => {
+// ✅ Универсальный обработчик с refresh + retry
+const withRefresh = async (action) => {
   try {
+    const refreshed = await userStore.refresh()
+    if (!refreshed) {
+      userStore.logout()
+      router.push('/login')
+      return
+    }
+    await action()
+  } catch (error) {
+    console.error('Ошибка выполнения действия:', error)
+    router.push({ name: 'Error' })
+  }
+}
+
+const fetchAccounts = async () => {
+  await withRefresh(async () => {
     const token = localStorage.getItem('accessToken')
     const response = await fetch('/dashboard/api/v1/accounts', {
       headers: {
@@ -195,31 +213,10 @@ const fetchAccounts = async () => {
       },
     })
 
-    if (!response.ok) {
-      if (response.status === 401) {
-        // Токен истёк — пробуем обновить
-        const refreshed = await userStore.refresh()
-
-        if (refreshed) {
-          // Повторяем оригинальный запрос (например, через ту же функцию)
-          return await fetchAccounts(true)
-        } else {
-          // Обновление не удалось — разлогиниваем
-          userStore.logout()
-          router.push('/')
-        }
-      } else {
-        // Обработка других ошибок
-        console.error('Ошибка запроса:', await response.json())
-      }
-    }
-
+    if (!response.ok) throw new Error(await response.text())
     accounts.value = await response.json()
-  } catch (error) {
-    console.error('Error fetching accounts:', error)
-  }
+  })
 }
-
 
 const openEditModal = (account) => {
   editForm.value = {
@@ -237,7 +234,7 @@ const closeEditModal = () => {
 }
 
 const updateAccount = async () => {
-  try {
+  await withRefresh(async () => {
     const token = localStorage.getItem('accessToken')
     const response = await fetch(`/dashboard/api/v1/accounts/${editForm.value.id}`, {
       method: 'PUT',
@@ -248,36 +245,14 @@ const updateAccount = async () => {
       body: JSON.stringify(editForm.value)
     })
 
-    if (!response.ok) {
-      if (response.status === 401) {
-        // Токен истёк — пробуем обновить
-        const refreshed = await userStore.refresh()
+    if (!response.ok) throw new Error(await response.text())
 
-        if (refreshed) {
-          // Повторяем оригинальный запрос (например, через ту же функцию)
-          return await updateAccount(true)
-        } else {
-          // Обновление не удалось — разлогиниваем
-          userStore.logout()
-          router.push('/')
-        }
-      } else {
-        // Обработка других ошибок
-        console.error('Ошибка запроса:', await response.json())
-      }
-    }
-
-    // Update the local data
     const index = accounts.value.findIndex(a => a.id === editForm.value.id)
-    if (index !== -1) {
-      accounts.value[index] = { ...editForm.value }
-    }
+    if (index !== -1) accounts.value[index] = { ...editForm.value }
 
     closeEditModal()
     await fetchAccounts()
-  } catch (error) {
-    console.error('Error updating account:', error)
-  }
+  })
 }
 
 const confirmDelete = (id) => {
@@ -291,47 +266,26 @@ const closeDeleteModal = () => {
 }
 
 const deleteAccount = async () => {
-  try {
+  await withRefresh(async () => {
     const token = localStorage.getItem('accessToken')
     const response = await fetch(`/dashboard/api/v1/accounts/${accountToDelete.value}`, {
       method: 'DELETE',
       headers: {
-          'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${token}`,
       }
     })
 
-    if (!response.ok) {
-      if (response.status === 401) {
-        // Токен истёк — пробуем обновить
-        const refreshed = await userStore.refresh()
+    if (!response.ok) throw new Error(await response.text())
 
-        if (refreshed) {
-          // Повторяем оригинальный запрос (например, через ту же функцию)
-          return await deleteAccount(true)
-        } else {
-          // Обновление не удалось — разлогиниваем
-          userStore.logout()
-          router.push('/')
-        }
-      } else {
-        // Обработка других ошибок
-        console.error('Ошибка запроса:', await response.json())
-      }
-    }
-
-    // Remove the account from local data
     accounts.value = accounts.value.filter(a => a.id !== accountToDelete.value)
     closeDeleteModal()
     await fetchAccounts()
-  } catch (error) {
-    console.error('Error deleting account:', error)
-  }
+  })
 }
 
-onMounted(() => {
-  fetchAccounts()
-})
+onMounted(fetchAccounts)
 </script>
+
 
 <style scoped>
 /* Add any additional styles here if needed */

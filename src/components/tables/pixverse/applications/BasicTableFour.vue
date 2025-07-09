@@ -206,83 +206,96 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+
+const router = useRouter()
+const userStore = useAuthStore()
 
 const styles = ref([])
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
 const styleToDelete = ref(null)
+const isUpdating = ref(false)
+const isDeleting = ref(false)
+
 const editForm = ref({
   id: null,
   app_id: '',
   template_ids: [],
   style_ids: []
 })
+
 const previewImage = ref(null)
 const newImage = ref(null)
-const isUpdating = ref(false)
-const isDeleting = ref(false)
 
-// Новые данные для выбора шаблонов и стилей
 const availableTemplates = ref([])
 const availableStyles = ref([])
 const selectedTemplateIds = ref([])
 const selectedStyleIds = ref([])
 
-const userStore = useAuthStore()
+// ========== Универсальный обработчик 401 и повторного запроса ==========
+const withRefresh = async (action) => {
+  try {
+    const refreshed = await userStore.refresh()
+    if (!refreshed) {
+      userStore.logout()
+      router.push('/')
+      return
+    }
+    await action()
+  } catch (err) {
+    console.error('Ошибка при повторном запросе:', err)
+    router.push({ name: 'Error' })
+  }
+}
+
+// ========== FETCH ==========
 
 const fetchStyles = async () => {
   try {
     const response = await fetch('/dashboard/api/v1/applications')
-    if (!response.ok) {
-      throw new Error('Failed to fetch applications')
-    }
+    if (!response.ok) throw new Error('Failed to fetch applications')
     styles.value = await response.json()
   } catch (error) {
     console.error('Error fetching applications:', error)
   }
 }
 
-// Загрузка доступных шаблонов
 const fetchTemplates = async () => {
   try {
     const response = await fetch('/dashboard/api/v1/templates')
-    if (!response.ok) {
-      throw new Error('Failed to fetch templates')
-    }
+    if (!response.ok) throw new Error('Failed to fetch templates')
     availableTemplates.value = await response.json()
   } catch (error) {
     console.error('Error fetching templates:', error)
   }
 }
 
-// Загрузка доступных стилей
 const fetchStylesList = async () => {
   try {
     const response = await fetch('/dashboard/api/v1/styles')
-    if (!response.ok) {
-      throw new Error('Failed to fetch styles')
-    }
+    if (!response.ok) throw new Error('Failed to fetch styles')
     availableStyles.value = await response.json()
   } catch (error) {
     console.error('Error fetching styles:', error)
   }
 }
 
+// ========== MODAL CONTROL ==========
+
 const openEditModal = (application) => {
   editForm.value = {
     id: application.id,
     app_id: application.app_id,
-    template_ids: application.templates ? application.templates.map(t => t.id) : [],
-    style_ids: application.styles ? application.styles.map(s => s.id) : []
+    template_ids: application.templates?.map(t => t.id) || [],
+    style_ids: application.styles?.map(s => s.id) || []
   }
 
-  // Устанавливаем выбранные ID
   selectedTemplateIds.value = [...editForm.value.template_ids]
   selectedStyleIds.value = [...editForm.value.style_ids]
-
   showEditModal.value = true
 }
 
@@ -291,6 +304,18 @@ const closeEditModal = () => {
   selectedTemplateIds.value = []
   selectedStyleIds.value = []
 }
+
+const confirmDelete = (id) => {
+  styleToDelete.value = id
+  showDeleteModal.value = true
+}
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+  styleToDelete.value = null
+}
+
+// ========== TOGGLES ==========
 
 const toggleTemplateSelection = (id) => {
   const index = selectedTemplateIds.value.indexOf(id)
@@ -310,6 +335,7 @@ const toggleStyleSelection = (id) => {
   }
 }
 
+// ========== UPDATE ==========
 const updateStyle = async () => {
   isUpdating.value = true
   try {
@@ -320,109 +346,79 @@ const updateStyle = async () => {
       style_ids: selectedStyleIds.value
     }
 
-    const response = await fetch(`/dashboard/api/v1/applications/${editForm.value.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(payload)
-    })
+    const request = async () => {
+      const response = await fetch(`/dashboard/api/v1/applications/${editForm.value.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload)
+      })
 
-    if (!response.ok) {
-      if (response.status === 401) {
-        // Токен истёк — пробуем обновить
-        const refreshed = await userStore.refresh()
-
-        if (refreshed) {
-          // Повторяем оригинальный запрос
-          return await updateStyle(true)
+      if (!response.ok) {
+        if (response.status === 401) {
+          return await withRefresh(request)
         } else {
-          // Обновление не удалось — разлогиниваем
-          userStore.logout()
-          router.push('/')
-          return
+          const errorData = await response.json()
+          throw new Error(errorData.message || 'Failed to update application')
         }
-      } else {
-        // Обработка других ошибок
-        const errorData = await response.json()
-        console.error('Ошибка запроса:', errorData)
-        throw new Error(errorData.message || 'Failed to update application')
       }
+
+      const updatedApplication = await response.json()
+      const index = styles.value.findIndex(a => a.id === editForm.value.id)
+      if (index !== -1) {
+        styles.value[index] = updatedApplication
+      }
+
+      closeEditModal()
+      await fetchStyles()
     }
 
-    const updatedApplication = await response.json()
-
-    // Обновляем локальные данные
-    const index = styles.value.findIndex(a => a.id === editForm.value.id)
-    if (index !== -1) {
-      styles.value[index] = updatedApplication
-    }
-
-    closeEditModal()
-    await fetchStyles()
+    await request()
   } catch (error) {
     console.error('Error updating application:', error)
-    // Здесь можно добавить отображение ошибки пользователю
   } finally {
     isUpdating.value = false
   }
 }
 
-const confirmDelete = (id) => {
-  styleToDelete.value = id
-  showDeleteModal.value = true
-}
-
-const closeDeleteModal = () => {
-  showDeleteModal.value = false
-  styleToDelete.value = null
-}
-
+// ========== DELETE ==========
 const deleteApplication = async () => {
   isDeleting.value = true
   try {
     const token = localStorage.getItem('accessToken')
-    const response = await fetch(`/dashboard/api/v1/applications/${styleToDelete.value}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
 
-    if (!response.ok) {
-      if (response.status === 401) {
-        // Токен истёк — пробуем обновить
-        const refreshed = await userStore.refresh()
-
-        if (refreshed) {
-          // Повторяем оригинальный запрос
-          return await deleteApplication()
-        } else {
-          // Обновление не удалось — разлогиниваем
-          userStore.logout()
-          router.push('/')
-          return
+    const request = async () => {
+      const response = await fetch(`/dashboard/api/v1/applications/${styleToDelete.value}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-      } else {
-        // Обработка других ошибок
-        console.error('Ошибка запроса:', await response.json())
-        throw new Error('Failed to delete application')
+      })
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          return await withRefresh(request)
+        } else {
+          throw new Error(await response.text())
+        }
       }
+
+      styles.value = styles.value.filter(a => a.id !== styleToDelete.value)
+      closeDeleteModal()
+      await fetchStyles()
     }
 
-    // Удаляем приложение из локальных данных
-    styles.value = styles.value.filter(a => a.id !== styleToDelete.value)
-    closeDeleteModal()
-    await fetchStyles()
+    await request()
   } catch (error) {
     console.error('Error deleting application:', error)
-    // Здесь можно добавить отображение ошибки пользователю
   } finally {
     isDeleting.value = false
   }
 }
 
+// ========== INIT ==========
 onMounted(() => {
   fetchStyles()
   fetchTemplates()

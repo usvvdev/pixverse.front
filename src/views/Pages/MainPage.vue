@@ -74,8 +74,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { RouterLink } from 'vue-router'
-import { useAuthStore } from '../../stores/auth'
+import { useAuthStore } from '@/stores/auth'; // путь поправь, если другой
 
 interface Service {
   id: string;
@@ -106,25 +105,28 @@ export default defineComponent({
       }
     ];
 
-    const navigateToService = async (route: string) => {
-      isLoading.value = true;
-
+    // 💡 Универсальная обёртка для refresh + error handling
+    const withRefresh = async (action: () => Promise<void>) => {
       try {
-        const refreshed = await userStore.refresh()
-
+        const refreshed = await userStore.refresh();
         if (!refreshed) {
           userStore.logout();
           router.push('/login');
           return;
         }
-
-        router.push(route);
-      } catch (error) {
-        console.error('Error navigating to service:', error);
+        await action();
+      } catch (err) {
+        console.error('Ошибка выполнения действия:', err);
         router.push({ name: 'Error' });
-      } finally {
-        isLoading.value = false;
       }
+    };
+
+    const navigateToService = async (route: string) => {
+      isLoading.value = true;
+      await withRefresh(async () => {
+        router.push(route);
+      });
+      isLoading.value = false;
     };
 
     return {

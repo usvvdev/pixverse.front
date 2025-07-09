@@ -325,10 +325,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch} from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
-
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+
+const router = useRouter()
+const userStore = useAuthStore()
 
 const intersecting = ref({})
 const styles = ref([])
@@ -341,8 +344,25 @@ const showDeleteModal = ref(false)
 const styleToDelete = ref(null)
 
 const visibleVideos = ref<Record<number, boolean>>({})
+const visibleRows = ref({})
 
-// Функция, которая следит за появлением
+// ===== Универсальный обработчик 401 + повтор запроса =====
+const withRefresh = async (action: () => Promise<void>) => {
+  try {
+    const refreshed = await userStore.refresh()
+    if (!refreshed) {
+      userStore.logout()
+      router.push('/login')
+      return
+    }
+    await action()
+  } catch (err) {
+    console.error('Ошибка при повторном выполнении запроса:', err)
+    router.push({ name: 'Error' })
+  }
+}
+
+// ===== Отслеживание появления элементов =====
 const observeVisibility = (el: Element, index: number) => {
   const { stop } = useIntersectionObserver(
     el,
@@ -354,6 +374,50 @@ const observeVisibility = (el: Element, index: number) => {
     },
     { threshold: 0.1 },
   )
+}
+
+const observeRowVisibility = (el: Element, index: number) => {
+  const { stop } = useIntersectionObserver(
+    el,
+    ([{ isIntersecting }]) => {
+      if (isIntersecting) {
+        visibleRows.value[index] = true
+        stop()
+        checkVideoVisibilitySequential()
+      }
+    },
+    { threshold: 0.1 },
+  )
+}
+
+function checkVideoVisibilitySequential() {
+  for (let i = 0; i < paginatedStyles.value.length; i++) {
+    if (visibleRows.value[i]) {
+      if (i === 0 || visibleVideos.value[i - 1]) {
+        visibleVideos.value[i] = true
+      } else break
+    }
+  }
+}
+
+// ===== Пагинация =====
+const totalPages = computed(() => Math.ceil(styles.value.length / pageSize))
+
+const paginateStyles = () => {
+  const start = (currentPage.value - 1) * pageSize
+  const end = start + pageSize
+  paginatedStyles.value = styles.value.slice(start, end)
+}
+
+watch([styles, currentPage], paginateStyles)
+
+// ===== CRUD =====
+const fetchStyles = async () => {
+  await withRefresh(async () => {
+    const response = await fetch('/dashboard/api/v1/styles')
+    if (!response.ok) throw new Error(await response.text())
+    styles.value = await response.json()
+  })
 }
 
 const editForm = ref({
@@ -373,63 +437,6 @@ const previewUrls = ref({
 const isUpdating = ref(false)
 const isDeleting = ref(false)
 
-const visibleRows = ref({})
-
-const observeRowVisibility = (el: Element, index: number) => {
-  const { stop } = useIntersectionObserver(
-    el,
-    ([{ isIntersecting }]) => {
-      if (isIntersecting) {
-        visibleRows.value[index] = true
-        stop()
-        checkVideoVisibilitySequential()
-      }
-    },
-    { threshold: 0.1 },
-  )
-}
-
-// Функция для поочередного включения видео
-function checkVideoVisibilitySequential() {
-  // Идём по индексам в порядке, включаем видео, если строка видна и либо первая строка, либо предыдущий видео тоже видно
-  for (let i = 0; i < paginatedStyles.value.length; i++) {
-    if (visibleRows.value[i]) {
-      if (i === 0) {
-        visibleVideos.value[i] = true
-      } else if (visibleVideos.value[i - 1]) {
-        visibleVideos.value[i] = true
-      } else {
-        // Предыдущее видео не загружено — остановить включение текущего видео
-        break
-      }
-    }
-  }
-}
-
-const userStore = useAuthStore()
-
-const totalPages = computed(() => Math.ceil(styles.value.length / pageSize))
-
-const fetchStyles = async () => {
-  try {
-    const response = await fetch('/dashboard/api/v1/styles')
-    if (!response.ok) throw new Error('Ошибка загрузки стилей')
-
-    const data = await response.json()
-    styles.value = data
-  } catch (err) {
-    console.error(err)
-  }
-}
-
-const paginateStyles = () => {
-  const start = (currentPage.value - 1) * pageSize
-  const end = start + pageSize
-  paginatedStyles.value = styles.value.slice(start, end)
-}
-
-watch([styles, currentPage], paginateStyles)
-
 const openEditModal = (style) => {
   editForm.value = {
     id: style.id,
@@ -446,6 +453,7 @@ const closeEditModal = () => {
   showEditModal.value = false
 
   editForm.value = {
+    id: null,
     name: '',
     prompt: '',
     is_active: '',
@@ -480,63 +488,41 @@ const onVideoUpload = (event, size) => {
 const updateTemplate = async () => {
   isUpdating.value = true
   try {
-    const token = localStorage.getItem('accessToken')
+    await withRefresh(async () => {
+      const token = localStorage.getItem('accessToken')
 
-    // Формируем query-параметры
-    const query = new URLSearchParams({
-      name: editForm.value.name,
-      prompt: editForm.value.prompt,
-      is_active: editForm.value.is_active,
-    }).toString()
+      const query = new URLSearchParams({
+        name: editForm.value.name,
+        prompt: editForm.value.prompt,
+        is_active: editForm.value.is_active,
+      }).toString()
 
-    // Формируем тело с файлами
-    const formData = new FormData()
-
-    if (editForm.value.preview_small instanceof File) {
-      formData.append('preview_small', editForm.value.preview_small)
-    }
-
-    if (editForm.value.preview_large instanceof File) {
-      formData.append('preview_large', editForm.value.preview_large)
-    }
-
-    const response = await fetch(`/dashboard/api/v1/styles/${editForm.value.id}?${query}`, {
-      method: 'PUT',
-      body: formData,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        // Токен истёк — пробуем обновить
-        const refreshed = await userStore.refresh()
-
-        if (refreshed) {
-          // Повторяем оригинальный запрос (например, через ту же функцию)
-          return await retryOriginalRequest()
-        } else {
-          // Обновление не удалось — разлогиниваем
-          userStore.logout()
-          router.push('/')
-        }
-      } else {
-        // Обработка других ошибок
-        console.error('Ошибка запроса:', await response.json())
+      const formData = new FormData()
+      if (editForm.value.preview_small instanceof File) {
+        formData.append('preview_small', editForm.value.preview_small)
       }
-    }
+      if (editForm.value.preview_large instanceof File) {
+        formData.append('preview_large', editForm.value.preview_large)
+      }
 
-    const updatedStyle = await response.json()
+      const response = await fetch(`/dashboard/api/v1/styles/${editForm.value.id}?${query}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      })
 
-    // Update the local data
-    const index = styles.value.findIndex((s) => s.id === editForm.value.id)
-    if (index !== -1) {
-      styles.value[index] = updatedStyle
-    }
+      if (!response.ok) throw new Error(await response.text())
 
-    await fetchStyles()
-    closeEditModal()
+      const updatedStyle = await response.json()
+
+      const index = styles.value.findIndex((s) => s.id === editForm.value.id)
+      if (index !== -1) styles.value[index] = updatedStyle
+
+      closeEditModal()
+      await fetchStyles()
+    })
   } catch (error) {
     console.error('Error updating style:', error)
   } finally {
@@ -557,38 +543,23 @@ const closeDeleteModal = () => {
 const deleteStyle = async () => {
   isDeleting.value = true
   try {
-    const token = localStorage.getItem('accessToken')
-    const response = await fetch(`/dashboard/api/v1/styles/${styleToDelete.value}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    await withRefresh(async () => {
+      const token = localStorage.getItem('accessToken')
+
+      const response = await fetch(`/dashboard/api/v1/styles/${styleToDelete.value}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (!response.ok) throw new Error(await response.text())
+
+      styles.value = styles.value.filter((s) => s.id !== styleToDelete.value)
+
+      await fetchStyles()
+      closeDeleteModal()
     })
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        // Токен истёк — пробуем обновить
-        const refreshed = await userStore.refresh()
-
-        if (refreshed) {
-          // Повторяем оригинальный запрос (например, через ту же функцию)
-          return await retryOriginalRequest()
-        } else {
-          // Обновление не удалось — разлогиниваем
-          userStore.logout()
-          router.push('/')
-        }
-      } else {
-        // Обработка других ошибок
-        console.error('Ошибка запроса:', await response.json())
-      }
-    }
-
-    // Remove the style from local data
-    styles.value = styles.value.filter((s) => s.id !== styleToDelete.value)
-
-    await fetchStyles()
-    closeDeleteModal()
   } catch (error) {
     console.error('Error deleting style:', error)
   } finally {
@@ -596,9 +567,7 @@ const deleteStyle = async () => {
   }
 }
 
-onMounted(() => {
-  fetchStyles()
-})
+onMounted(fetchStyles)
 </script>
 
 <style scoped>

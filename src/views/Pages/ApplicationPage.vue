@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth' // путь поправь при необходимости
 import Card from '@/components/common/ApplicationCard.vue'
 import AddApplication from '@/components/common/AddApplication.vue'
 
@@ -18,12 +19,29 @@ interface Application {
   technology?: string
 }
 
+const router = useRouter()
+const userStore = useAuthStore()
 const apps = ref<Application[]>([])
 const showModal = ref(false)
 const editableApp = ref<Application | null>(null)
 
-const fetchApps = async () => {
+const withRefresh = async (action: () => Promise<void>) => {
   try {
+    const refreshed = await userStore.refresh()
+    if (!refreshed) {
+      userStore.logout()
+      router.push('/login')
+      return
+    }
+    await action()
+  } catch (err) {
+    console.error('Ошибка выполнения действия:', err)
+    router.push({ name: 'Error' })
+  }
+}
+
+const fetchApps = async () => {
+  await withRefresh(async () => {
     const token = localStorage.getItem('accessToken')
     const response = await fetch('/dashboard/api/v1/store_applications', {
       headers: { Authorization: `Bearer ${token}` },
@@ -33,64 +51,64 @@ const fetchApps = async () => {
 
     const data = await response.json()
     apps.value = data
-  } catch (err) {
-    console.error('Ошибка при получении приложений:', err)
-  }
+  })
 }
 
 const addApplication = async (app: Application) => {
-  const token = localStorage.getItem('accessToken')
+  await withRefresh(async () => {
+    const token = localStorage.getItem('accessToken')
+    const response = await fetch('/dashboard/api/v1/store_applications', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(app),
+    })
 
-  const response = await fetch('/dashboard/api/v1/store_applications', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(app),
+    if (!response.ok) throw new Error('Ошибка при создании приложения')
+
+    const newApp = await response.json()
+    apps.value.push(newApp)
   })
-
-  if (!response.ok) throw new Error('Ошибка при создании приложения')
-
-  const newApp = await response.json()
-  apps.value.push(newApp)
 }
 
 const updateApplication = async (app: Application) => {
-  const token = localStorage.getItem('accessToken')
+  await withRefresh(async () => {
+    const token = localStorage.getItem('accessToken')
+    const response = await fetch(`/dashboard/api/v1/store_applications/${app.id}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(app),
+    })
 
-  const response = await fetch(`/dashboard/api/v1/store_applications/${app.id}`, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(app),
+    if (!response.ok) throw new Error('Ошибка при обновлении приложения')
+
+    const updated = await response.json()
+    const index = apps.value.findIndex((a) => a.id === app.id)
+    if (index !== -1) apps.value[index] = updated
   })
-
-  if (!response.ok) throw new Error('Ошибка при обновлении приложения')
-
-  const updated = await response.json()
-  const index = apps.value.findIndex((a) => a.id === app.id)
-  if (index !== -1) apps.value[index] = updated
 }
 
 const handleDelete = async (appId: number) => {
-  const token = localStorage.getItem('accessToken')
+  await withRefresh(async () => {
+    const token = localStorage.getItem('accessToken')
+    const response = await fetch(`/dashboard/api/v1/store_applications/${appId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
 
-  const response = await fetch(`/dashboard/api/v1/store_applications/${appId}`, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    if (!response.ok) throw new Error('Ошибка при удалении приложения')
+
+    apps.value = apps.value.filter((a) => a.id !== appId)
+    await fetchApps()
+    closeModal()
   })
-
-  if (!response.ok) throw new Error('Ошибка при удалении приложения')
-
-  apps.value = apps.value.filter((a) => a.id !== appId)
-
-  await fetchApps()
-  closeModal()
 }
 
 function openAdd() {
@@ -109,21 +127,18 @@ function closeModal() {
 }
 
 async function saveApplication(app: Application) {
-  try {
-    if (app.id) {
-      await updateApplication(app)
-    } else {
-      await addApplication(app)
-    }
-    await fetchApps()
-    closeModal()
-  } catch (err) {
-    console.error('Ошибка сохранения:', err)
+  if (app.id) {
+    await updateApplication(app)
+  } else {
+    await addApplication(app)
   }
+  await fetchApps()
+  closeModal()
 }
 
 onMounted(fetchApps)
 </script>
+
 
 
 <template>
