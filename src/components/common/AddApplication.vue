@@ -1,7 +1,7 @@
 <!-- components/AddApplication.vue -->
 <template>
-  <div class="fixed inset-0 bg-black/50 flex justify-center items-start pt-20 z-50">
-    <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg max-w-3xl w-full p-6 overflow-auto max-h-[90vh]">
+  <div class="fixed inset-0 bg-white dark:bg-gray-900 z-50 overflow-auto p-6">
+    <div class="max-w-4xl mx-auto w-full">
       <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">{{ isEdit ? 'Редактировать приложение' : 'Добавить приложение' }}</h2>
 
       <form @submit.prevent="handleSubmit" class="space-y-5">
@@ -11,7 +11,7 @@
         </div>
 
         <div>
-          <label class="label">ID приложения</label>
+          <label class="label">Bundle ID приложения</label>
           <input v-model="form.application_id" class="input" placeholder="ID приложения" required />
         </div>
 
@@ -32,7 +32,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="label">Номер</label>
+            <label class="label">ID Приложения</label>
             <input v-model="form.application_number" class="input" />
           </div>
           <div>
@@ -175,6 +175,7 @@ const handleSubmit = () => {
 }
 .input {
   width: 100%;
+  max-width: 28rem; /* = max-w-md в Tailwind */
   padding: 0.5rem 0.75rem;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
