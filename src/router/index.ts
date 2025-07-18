@@ -70,6 +70,14 @@ const router = createRouter({
             title: 'Приложения Pixverse',
           },
         },
+        {
+          path: 'statistics',
+          name: 'Cтатистика Pixverse API',
+          component: () => import('../views/Tables/statistics/StatsTable.vue'),
+          meta: {
+            title: 'Cтатистика Pixverse API',
+          },
+        },
       ]
     },
     {
@@ -97,15 +105,7 @@ const router = createRouter({
           },
         },
       ]
-    },
-    {
-      path: '/statistics',
-      name: 'Cтатистика пользователей',
-      component: () => import('../views/Tables/statistics/StatsTable.vue'),
-      meta: {
-        title: 'Cтатистика пользователей',
-      },
-    },
+    }
   ],
 })
 

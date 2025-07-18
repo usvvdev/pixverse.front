@@ -244,7 +244,8 @@ const menuGroups = [
           { name: "Аккаунты", path: "/pix/accounts", pro: false },
           { name: "Шаблоны", path: "/pix/templates", pro: false },
           { name: "Стили", path: "/pix/styles", pro: false },
-          { name: "Приложения", path: "/pix/applications", pro: false }
+          { name: "Приложения", path: "/pix/applications", pro: false },
+          { name: "Статистика", path: "/pix/statistics", pro: false }
         ],
       },
       {
@@ -254,13 +255,7 @@ const menuGroups = [
           { name: "Шаблоны", path: "/photogenerator/templates", pro: false },
           { name: "Приложения", path: "/photogenerator/applications", pro: false }
         ],
-      },
-      {
-        name: "Статитиска пользователей",
-        icon: TableIcon,
-        path: "/statistics",
-        pro: false
-      },
+      }
     ],
   },
 ];
