@@ -86,12 +86,17 @@ const userIds = ref<string[]>([])
 const appIds = ref<string[]>([])
 
 const fetchStatistics = async () => {
+  const token = localStorage.getItem('accessToken')
   try {
     const params = new URLSearchParams()
     if (selectedUserId.value) params.append('user_id', selectedUserId.value)
     if (selectedAppId.value) params.append('app_id', selectedAppId.value)
 
-    const response = await fetch(`/dashboard/api/v1/statistics?app_name=chatgpt&${params.toString()}`)
+    const response = await fetch(`/dashboard/api/v1/statistics?app_name=chatgpt&${params.toString()}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      }
+    })
     if (!response.ok) throw new Error('Failed to fetch statistics')
 
     users.value = await response.json()
@@ -101,8 +106,13 @@ const fetchStatistics = async () => {
 }
 
 const fetchFilters = async () => {
+  const token = localStorage.getItem('accessToken')
   try {
-    const res = await fetch('/dashboard/api/v1/statistics/filters')
+    const res = await fetch('/dashboard/api/v1/statistics/filters', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      }
+    })
     if (!res.ok) throw new Error('Failed to fetch filters')
 
     const data = await res.json()
