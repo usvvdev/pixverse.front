@@ -73,7 +73,7 @@ const router = createRouter({
         {
           path: 'statistics',
           name: 'Cтатистика Pixverse API',
-          component: () => import('../views/Tables/statistics/StatsTable.vue'),
+          component: () => import('../views/Tables/pixverse/StatsTable.vue'),
           meta: {
             title: 'Cтатистика Pixverse API',
           },
@@ -102,6 +102,14 @@ const router = createRouter({
           component: () => import('../views/Tables/photogenerator/ApplicationTable.vue'),
           meta: {
             title: 'Приложения Photo Genrator',
+          },
+        },
+        {
+          path: 'statistics',
+          name: 'Cтатистика Photo Generator API',
+          component: () => import('../views/Tables/photogenerator/StatsTable.vue'),
+          meta: {
+            title: 'Cтатистика Pixverse API',
           },
         },
       ]

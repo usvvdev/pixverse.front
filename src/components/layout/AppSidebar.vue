@@ -253,7 +253,8 @@ const menuGroups = [
         icon: TableIcon,
         subItems: [
           { name: "Шаблоны", path: "/photogenerator/templates", pro: false },
-          { name: "Приложения", path: "/photogenerator/applications", pro: false }
+          { name: "Приложения", path: "/photogenerator/applications", pro: false },
+          { name: "Статистика", path: "/photogenerator/statistics", pro: false }
         ],
       }
     ],

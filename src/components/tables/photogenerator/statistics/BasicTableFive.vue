@@ -44,12 +44,6 @@
               <th class="px-5 py-3 text-left w-1/12 sm:px-6">
                 <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Balance</p>
               </th>
-              <th class="px-5 py-3 text-left w-3/12 sm:px-6">
-                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Generations</p>
-              </th>
-              <th class="px-5 py-3 text-left w-3/12 sm:px-6">
-                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Accounts</p>
-              </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -69,26 +63,6 @@
               </td>
               <td class="px-5 py-4 sm:px-6 text-theme-sm text-gray-600 dark:text-gray-400">
                 {{ user.balance }}
-              </td>
-              <td class="px-5 py-4 sm:px-6 text-theme-sm text-gray-600 dark:text-gray-400">
-                <ul class="list-disc list-inside text-xs space-y-1">
-                  <li
-                    v-for="id in user.generation_ids.slice(0, 3)"
-                    :key="id"
-                  >
-                    {{ id }}
-                  </li>
-                  <li v-if="user.generation_ids.length > 3" class="italic text-gray-400">
-                    +{{ user.generation_ids.length - 3 }} ещё
-                  </li>
-                </ul>
-              </td>
-              <td class="px-5 py-4 sm:px-6 text-theme-sm text-gray-600 dark:text-gray-400">
-                <ul class="list-disc list-inside text-xs space-y-1">
-                  <li v-for="account in user.accounts" :key="account.id">
-                    {{ account.username }}
-                  </li>
-                </ul>
               </td>
             </tr>
           </tbody>
@@ -117,7 +91,7 @@ const fetchStatistics = async () => {
     if (selectedUserId.value) params.append('user_id', selectedUserId.value)
     if (selectedAppId.value) params.append('app_id', selectedAppId.value)
 
-    const response = await fetch(`/dashboard/api/v1/statistics?app_name=pixverse&${params.toString()}`)
+    const response = await fetch(`/dashboard/api/v1/statistics?app_name=chatgpt&${params.toString()}`)
     if (!response.ok) throw new Error('Failed to fetch statistics')
 
     users.value = await response.json()
