@@ -44,6 +44,9 @@
               <th class="px-5 py-3 text-left w-1/12 sm:px-6">
                 <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Balance</p>
               </th>
+              <th class="px-5 py-3 text-left w-3/12 sm:px-6">
+                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Generations</p>
+              </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -63,6 +66,27 @@
               </td>
               <td class="px-5 py-4 sm:px-6 text-theme-sm text-gray-600 dark:text-gray-400">
                 {{ user.balance }}
+              </td>
+              <td class="px-5 py-4 sm:px-6 text-theme-sm text-gray-600 dark:text-gray-400">
+                <div class="flex items-center space-x-2">
+                  <div
+                    v-for="(url, i) in user.generation_ids.slice(0, 3)"
+                    :key="i"
+                    class="w-12 h-12 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700"
+                  >
+                    <img
+                      :src="url"
+                      :alt="`Generation ${i + 1}`"
+                      class="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div
+                    v-if="user.generation_ids.length > 3"
+                    class="flex items-center justify-center w-12 h-12 rounded-lg bg-gray-100 text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-300"
+                  >
+                    +{{ user.generation_ids.length - 3 }}
+                  </div>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -108,7 +132,7 @@ const fetchStatistics = async () => {
 const fetchFilters = async () => {
   const token = localStorage.getItem('accessToken')
   try {
-    const res = await fetch('/dashboard/api/v1/statistics/filters', {
+    const res = await fetch('/dashboard/api/v1/statistics/filters?app_name=chatgpt', {
       headers: {
         'Authorization': `Bearer ${token}`,
       }

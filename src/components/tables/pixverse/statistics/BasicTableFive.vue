@@ -134,7 +134,7 @@ const fetchStatistics = async () => {
 const fetchFilters = async () => {
   const token = localStorage.getItem('accessToken')
   try {
-    const res = await fetch('/dashboard/api/v1/statistics/filters', {
+    const res = await fetch('/dashboard/api/v1/statistics/filters?app_name=pixverse', {
       headers: {
         'Authorization': `Bearer ${token}`,
       }
