@@ -1,8 +1,9 @@
-<!-- components/AddApplication.vue -->
 <template>
   <div class="fixed inset-0 bg-white dark:bg-gray-900 z-50 overflow-auto p-6">
     <div class="max-w-4xl mx-auto w-full">
-      <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">{{ isEdit ? 'Редактировать приложение' : 'Добавить приложение' }}</h2>
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+        {{ isEdit ? 'Редактировать приложение' : 'Добавить приложение' }}
+      </h2>
 
       <form @submit.prevent="handleSubmit" class="space-y-5">
         <div>
@@ -64,6 +65,27 @@
           </select>
         </div>
 
+        <!-- ✅ Выбор продуктов -->
+        <div>
+          <label class="label">Продукты</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-64 overflow-y-auto">
+            <div
+              v-for="product in products"
+              :key="product.id"
+              @click="toggleProduct(product)"
+              class="cursor-pointer border rounded-lg p-4 transition-all"
+              :class="{
+                'border-blue-500 bg-blue-50 dark:bg-blue-900/30': isSelected(product),
+                'border-gray-200 dark:border-gray-600': !isSelected(product),
+              }"
+            >
+              <h4 class="text-sm font-medium text-gray-900 dark:text-white">{{ product.name }}</h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Токенов: {{ product.tokens_amount }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Кнопки -->
         <div class="pt-4 flex justify-between flex-wrap gap-3">
           <div v-if="isEdit">
             <button
@@ -96,7 +118,13 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch, defineProps, defineEmits } from 'vue'
+import { ref, reactive, watch, defineProps, defineEmits, onMounted } from 'vue'
+
+interface Product {
+  id: number
+  name: string
+  tokens_amount: number
+}
 
 interface Application {
   id?: string
@@ -110,12 +138,7 @@ interface Application {
   start_date?: string
   release_date?: string
   technology?: string
-}
-
-const handleDelete = () => {
-  if (form.id) {
-    emit('delete', form.id)
-  }
+  products?: Product[]
 }
 
 const props = defineProps<{
@@ -136,11 +159,40 @@ const form = reactive<Application>({
   start_date: '',
   release_date: '',
   technology: '',
+  products: [],
 })
 
 const isEdit = !!props.modelValue
+const products = ref<Product[]>([])
 
-// Инициализация формы из props (при редактировании)
+const fetchProducts = async () => {
+  try {
+    const token = localStorage.getItem('accessToken')
+    const res = await fetch('/dashboard/api/v1/products', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    if (!res.ok) throw new Error('Ошибка загрузки продуктов')
+    products.value = await res.json()
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+const toggleProduct = (product: Product) => {
+  const index = form.products?.findIndex(p => p.id === product.id) ?? -1
+  if (index >= 0) {
+    form.products?.splice(index, 1)
+  } else {
+    form.products?.push(product)
+  }
+}
+
+const isSelected = (product: Product) => {
+  return form.products?.some(p => p.id === product.id)
+}
+
 watch(
   () => props.modelValue,
   (val) => {
@@ -149,20 +201,31 @@ watch(
         ...val,
         start_date: val.start_date?.slice(0, 10) ?? '',
         release_date: val.release_date?.slice(0, 10) ?? '',
+        products: val.products ?? [],
       })
     } else {
-      Object.keys(form).forEach((k) => {
+      Object.keys(form).forEach((key) => {
         // @ts-ignore
-        form[k] = ''
+        form[key] = ''
       })
+      form.products = []
     }
   },
-  { immediate: true },
+  { immediate: true }
 )
 
+onMounted(() => {
+  fetchProducts()
+})
+
 const handleSubmit = () => {
-  // отправить данные и закрыть форму
   emit('save', { ...form })
+}
+
+const handleDelete = () => {
+  if (form.id) {
+    emit('delete', form.id)
+  }
 }
 </script>
 
@@ -175,7 +238,7 @@ const handleSubmit = () => {
 }
 .input {
   width: 100%;
-  max-width: 28rem; /* = max-w-md в Tailwind */
+  max-width: 28rem;
   padding: 0.5rem 0.75rem;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
