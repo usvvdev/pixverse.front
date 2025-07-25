@@ -16,6 +16,7 @@ interface Application {
   category?: string
   start_date?: string
   release_date?: string
+  webhook_url?: string
   technology?: string
 }
 

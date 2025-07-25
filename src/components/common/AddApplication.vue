@@ -65,6 +65,11 @@
           </select>
         </div>
 
+        <div>
+            <label class="label">Webhook</label>
+            <input v-model="form.webhook_url" class="input" />
+          </div>
+
         <!-- ✅ Выбор продуктов -->
         <div>
           <label class="label">Продукты</label>
@@ -138,6 +143,7 @@ interface Application {
   start_date?: string
   release_date?: string
   technology?: string
+  webhook_url?: string
   products?: Product[]
 }
 
@@ -159,6 +165,7 @@ const form = reactive<Application>({
   start_date: '',
   release_date: '',
   technology: '',
+  webhook_url: '',
   products: [],
 })
 
