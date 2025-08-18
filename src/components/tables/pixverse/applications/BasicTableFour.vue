@@ -256,7 +256,13 @@ const withRefresh = async (action) => {
 
 const fetchStyles = async () => {
   try {
-    const response = await fetch('/dashboard/api/v1/applications')
+    const token = localStorage.getItem('accessToken')
+
+    const response = await fetch('/dashboard/api/v1/applications', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    })
     if (!response.ok) throw new Error('Failed to fetch applications')
     styles.value = await response.json()
   } catch (error) {
@@ -266,7 +272,13 @@ const fetchStyles = async () => {
 
 const fetchTemplates = async () => {
   try {
-    const response = await fetch('/dashboard/api/v1/templates')
+    const token = localStorage.getItem('accessToken')
+
+    const response = await fetch('/dashboard/api/v1/templates', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    })
     if (!response.ok) throw new Error('Failed to fetch templates')
     availableTemplates.value = await response.json()
   } catch (error) {
@@ -276,7 +288,13 @@ const fetchTemplates = async () => {
 
 const fetchStylesList = async () => {
   try {
-    const response = await fetch('/dashboard/api/v1/styles')
+    const token = localStorage.getItem('accessToken')
+
+    const response = await fetch('/dashboard/api/v1/styles', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    })
     if (!response.ok) throw new Error('Failed to fetch styles')
     availableStyles.value = await response.json()
   } catch (error) {
