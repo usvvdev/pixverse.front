@@ -56,6 +56,9 @@ const fetchApps = async () => {
 }
 
 const addApplication = async (app: Application) => {
+  // исключаем webhook_url
+  const { webhook_url, ...payload } = app
+
   await withRefresh(async () => {
     const token = localStorage.getItem('accessToken')
     const response = await fetch('/dashboard/api/v1/store_applications', {
@@ -64,7 +67,7 @@ const addApplication = async (app: Application) => {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(app),
+      body: JSON.stringify(payload),
     })
 
     if (!response.ok) throw new Error('Ошибка при создании приложения')
