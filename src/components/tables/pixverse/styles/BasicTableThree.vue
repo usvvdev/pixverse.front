@@ -414,7 +414,13 @@ watch([styles, currentPage], paginateStyles)
 // ===== CRUD =====
 const fetchStyles = async () => {
   await withRefresh(async () => {
-    const response = await fetch('/dashboard/api/v1/styles')
+    const token = localStorage.getItem('accessToken')
+
+    const response = await fetch('/dashboard/api/v1/styles', {
+      headers: {
+          Authorization: `Bearer ${token}`,
+      },
+    })
     if (!response.ok) throw new Error(await response.text())
     styles.value = await response.json()
   })
