@@ -67,7 +67,11 @@
 
         <div>
             <label class="label">Webhook</label>
-            <input v-model="form.webhook_url" class="input" />
+            <input
+              v-model="form.webhook_url"
+              class="input"
+              readonly
+            />
           </div>
 
         <!-- ✅ Выбор продуктов -->

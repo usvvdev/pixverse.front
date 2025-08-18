@@ -430,7 +430,13 @@ function checkVideoVisibilitySequential() {
 // ====== Работа с шаблонами ======
 const fetchStyles = async () => {
   await withRefresh(async () => {
-    const response = await fetch('/dashboard/api/v1/templates')
+    const token = localStorage.getItem('accessToken')
+
+    const response = await fetch('/dashboard/api/v1/templates', {
+      headers: {
+          Authorization: `Bearer ${token}`,
+        },
+    })
     if (!response.ok) throw new Error(await response.text())
     styles.value = await response.json()
   })
