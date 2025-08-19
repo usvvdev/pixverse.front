@@ -248,15 +248,15 @@ const menuGroups = [
           { name: "Статистика", path: "/pix/statistics", pro: false }
         ],
       },
-      {
-        name: "Photo Generator",
-        icon: TableIcon,
-        subItems: [
-          { name: "Шаблоны", path: "/photogenerator/templates", pro: false },
-          { name: "Приложения", path: "/photogenerator/applications", pro: false },
-          { name: "Статистика", path: "/photogenerator/statistics", pro: false }
-        ],
-      }
+      // {
+      //   name: "Photo Generator",
+      //   icon: TableIcon,
+      //   subItems: [
+      //     { name: "Шаблоны", path: "/photogenerator/templates", pro: false },
+      //     { name: "Приложения", path: "/photogenerator/applications", pro: false },
+      //     { name: "Статистика", path: "/photogenerator/statistics", pro: false }
+      //   ],
+      // }
     ],
   },
 ];

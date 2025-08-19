@@ -80,40 +80,40 @@ const router = createRouter({
         },
       ]
     },
-    {
-      path: '/photogenerator',
-      name: 'Photo Generator API',
-      redirect: '/photogenerator/templates',
-      meta: {
-        title: 'Photo Genrator',
-      },
-      children: [
-        {
-          path: 'templates',
-          name: 'Шаблоны Photo Genrator',
-          component: () => import('../views/Tables/photogenerator/TemplateTable.vue'),
-          meta: {
-            title: 'Шаблоны Photo Genrator',
-          },
-        },
-        {
-          path: 'applications',
-          name: 'Приложения Photo Genrator',
-          component: () => import('../views/Tables/photogenerator/ApplicationTable.vue'),
-          meta: {
-            title: 'Приложения Photo Genrator',
-          },
-        },
-        {
-          path: 'statistics',
-          name: 'Cтатистика Photo Generator API',
-          component: () => import('../views/Tables/photogenerator/StatsTable.vue'),
-          meta: {
-            title: 'Cтатистика Pixverse API',
-          },
-        },
-      ]
-    }
+    // {
+    //   path: '/photogenerator',
+    //   name: 'Photo Generator API',
+    //   redirect: '/photogenerator/templates',
+    //   meta: {
+    //     title: 'Photo Genrator',
+    //   },
+    //   children: [
+    //     {
+    //       path: 'templates',
+    //       name: 'Шаблоны Photo Genrator',
+    //       component: () => import('../views/Tables/photogenerator/TemplateTable.vue'),
+    //       meta: {
+    //         title: 'Шаблоны Photo Genrator',
+    //       },
+    //     },
+    //     {
+    //       path: 'applications',
+    //       name: 'Приложения Photo Genrator',
+    //       component: () => import('../views/Tables/photogenerator/ApplicationTable.vue'),
+    //       meta: {
+    //         title: 'Приложения Photo Genrator',
+    //       },
+    //     },
+    //     {
+    //       path: 'statistics',
+    //       name: 'Cтатистика Photo Generator API',
+    //       component: () => import('../views/Tables/photogenerator/StatsTable.vue'),
+    //       meta: {
+    //         title: 'Cтатистика Pixverse API',
+    //       },
+    //     },
+    //   ]
+    // }
   ],
 })
 

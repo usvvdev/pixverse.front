@@ -97,12 +97,12 @@ export default defineComponent({
         description: 'Service for Pixverse API',
         route: '/pix'
       },
-      {
-        id: 'photo-generator',
-        name: 'Photo Generator',
-        description: 'Service for Photo Generator API',
-        route: '/photogenerator'
-      }
+      // {
+      //   id: 'photo-generator',
+      //   name: 'Photo Generator',
+      //   description: 'Service for Photo Generator API',
+      //   route: '/photogenerator'
+      // }
     ];
 
     // 💡 Универсальная обёртка для refresh + error handling
