@@ -1,0 +1,43 @@
+@use '@/app/styles/varibles.scss' as *;
+
+.sidebar {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-content: start;
+  gap: 40px;
+  justify-items: center;
+  max-width: fit-content;
+  min-height: 100%;
+  margin-right: 25px;
+
+  &__logo {
+    font-size: 35px;
+    font-weight: 350;
+    text-transform: uppercase;
+
+    &-title {
+      color: $dark-gray;
+    }
+  }
+
+  &__navigation,
+  &__logout {
+    display: grid;
+    gap: 8px;
+    align-content: center;
+
+    // 📱 горизонтальная раскладка на мобилках
+    @media (max-width: 600px) {
+      display: flex;
+      flex-direction: row; // горизонтально
+      justify-content: center; // по центру
+      align-items: center;
+      gap: 15px; // расстояние между кнопками
+      width: 100%; // растянуть на всю ширину
+    }
+  }
+
+  @media (max-width: 600px) {
+    margin-right: 0;
+  }
+}
