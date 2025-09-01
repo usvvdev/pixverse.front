@@ -3,13 +3,13 @@ import MainLayout from '@/app/layouts/main/ui/MainLayout.vue'
 import CardComponent from '@/components/card/ui/CardComponent.vue'
 import MenuSidebarWidget from '@/widgets/menu/ui/MenuSidebarWidget.vue'
 
-import { AuthUserController } from '@/services/api/controllers/auth/controller'
+import { UserController } from '@/services/api/controllers/user/controller'
 import { useController } from '@/services/composables/apiRetry'
 
 const token = localStorage.getItem('access_token')
 const tokenType = localStorage.getItem('token_type')
 
-const controller = new AuthUserController({
+const controller = new UserController({
   headers: {
     Authorization: `${tokenType} ${token}`,
   },
@@ -17,10 +17,7 @@ const controller = new AuthUserController({
 
 const services = useController(
   controller,
-  async () => {
-    const response = await controller.services.get()
-    return response.items
-  },
+  (c) => c.services.get().then((res) => res.items),
   'services',
 )
 </script>
@@ -35,11 +32,11 @@ const services = useController(
       <div class="wrapper__services">
         <CardComponent
           v-for="service in services"
-          :key="service.title"
+          :key="service.id"
           :isDocs="true"
           tag="docs"
           :title="service.title"
-          :href="`/dashboard/${service.title}`"
+          :href="`/admin/${service.title}`"
         />
       </div>
     </template>

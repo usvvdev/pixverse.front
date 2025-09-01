@@ -17,7 +17,6 @@ defineProps<{
     exact-active-class="sidebar__navigation-button--exact-active"
   >
     <component v-if="icon" :is="icon" class="sidebar__navigation-icon" />
-    <slot />
   </router-link>
 
   <button
@@ -27,8 +26,8 @@ defineProps<{
     @click="onClick"
   >
     <component v-if="icon" :is="icon" class="sidebar__navigation-icon" />
-    <slot />
   </button>
+  <slot />
 </template>
 
 <style lang="scss" scoped>

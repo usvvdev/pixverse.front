@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<!-- <script setup lang="ts">
 import MainLayout from '@/app/layouts/main/ui/MainLayout.vue'
 import MenuSidebarWidget from '@/widgets/menu/ui/MenuSidebarWidget.vue'
 import CardComponent from '@/components/card/ui/CardComponent.vue'
@@ -17,15 +17,12 @@ const controller = new DashboardController({
 
 const applications = useController(
   controller,
-  async () => {
-    const response = await controller.applications.get()
-    return response
-  },
+  (c) => c.applications.get(),
   'applications',
 )
-</script>
+</script> -->
 
-<template>
+<!-- <template>
   <MainLayout>
     <template #sidebar>
       <MenuSidebarWidget />
@@ -52,4 +49,4 @@ const applications = useController(
 
 <style lang="scss">
 @use './style' as *;
-</style>
+</style> -->

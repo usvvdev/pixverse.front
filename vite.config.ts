@@ -1,5 +1,4 @@
 import path from 'path'
-
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
@@ -8,11 +7,23 @@ import Icons from 'unplugin-icons/vite'
 import Components from 'unplugin-vue-components/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 
-// https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
+  const APP_URL: string = env.VITE_APP_URL
+  const PROXY_PATHS: string[] = JSON.parse(env.VITE_API_PATHS)
 
-  const APP_URL = env.VITE_APP_URL
+  const proxyConfig = Object.fromEntries(
+    PROXY_PATHS.map((p) => [
+      `/${p}`,
+      {
+        target: `${APP_URL}/${p}/`,
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+        rewrite: (path) => path.replace(new RegExp(`^/${p}`), `/${p}`),
+      },
+    ]),
+  )
 
   return {
     plugins: [
@@ -25,9 +36,9 @@ export default defineConfig(({ mode }) => {
       preprocessorOptions: {
         scss: {
           additionalData: `
-          @use "@/app/styles/varibles.scss" as *;
-          @use "@/app/styles/app.scss" as *;
-        `,
+            @use "@/app/styles/varibles.scss" as *;
+            @use "@/app/styles/app.scss" as *;
+          `,
         },
       },
     },
@@ -37,29 +48,10 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
-      proxy: {
-        '/auth': {
-          target: `${APP_URL}/auth/`,
-          changeOrigin: true,
-          secure: false,
-          ws: true,
-          rewrite: (path) => path.replace(/^\/auth/, '/auth'),
-        },
-        '/dashboard': {
-          target: `${APP_URL}/dashboard/`,
-          changeOrigin: true,
-          secure: false,
-          ws: true,
-          rewrite: (path) => path.replace(/^\/dashboard/, '/dashboard'),
-        },
-        '/pixverse': {
-          target: `${APP_URL}/pixverse/`,
-          changeOrigin: true,
-          secure: false,
-          ws: true,
-          rewrite: (path) => path.replace(/^\/pixverse/, '/pixverse'),
-        },
-      },
+      proxy: proxyConfig,
+      // host: true,
+      // port: 5173,
+      // strictPort: false,
     },
   }
 })

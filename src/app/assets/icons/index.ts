@@ -4,6 +4,11 @@ import ProductIcon from './ProductIcon.vue'
 import LogoutIcon from './LogoutIcon.vue'
 import LinkIcon from './LinkIcon.vue'
 import SettingsIcon from './SettingsIcon.vue'
+import AccountIcon from './AccountIcon.vue'
+import TemplateIcon from './TemplateIcon.vue'
+import StyleIcon from './StyleIcon.vue'
+import DeleteIcon from './DeleteIcon.vue'
+import EditIcon from './EditIcon.vue'
 
 export {
   ApplicationIcon,
@@ -12,4 +17,9 @@ export {
   LogoutIcon,
   LinkIcon,
   SettingsIcon,
+  AccountIcon,
+  TemplateIcon,
+  StyleIcon,
+  DeleteIcon,
+  EditIcon,
 }

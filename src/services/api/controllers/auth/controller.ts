@@ -1,10 +1,5 @@
 import { IHttpClient } from '../core'
-import {
-  HttpMethods,
-  AuthUserTokens,
-  AuthUserServices,
-  RequestBody,
-} from '../../types'
+import { HttpMethods, AuthUserTokens, RequestBody } from '../../types'
 
 import { toMethodKeys } from '../../utils'
 
@@ -25,9 +20,4 @@ export class AuthUserController extends IHttpClient {
     '/refresh',
     toMethodKeys([HttpMethods.POST]),
   ) as { post: (body?: RequestBody) => Promise<AuthUserTokens> }
-
-  public services = this.requestMethods<AuthUserServices>(
-    '/services',
-    toMethodKeys([HttpMethods.GET]),
-  ) as { get: () => Promise<AuthUserServices> }
 }

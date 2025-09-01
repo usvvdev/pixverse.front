@@ -15,11 +15,25 @@ const routes = [
         component: defineAsyncComponent(() => import('@/pages/service')),
         meta: { requiresAuth: true },
       },
+      // {
+      //   path: '/applications',
+      //   name: 'applications',
+      //   component: defineAsyncComponent(() => import('@/pages/application')),
+      //   meta: { requiresAuth: true },
+      // },
       {
-        path: '/applications',
-        name: 'applications',
-        component: defineAsyncComponent(() => import('@/pages/application')),
+        path: '/admin/:title',
+        name: 'admin',
+        component: defineAsyncComponent(() => import('@/pages/admin')),
+        props: true,
         meta: { requiresAuth: true },
+        children: [
+          {
+            path: ':subroute',
+            name: 'admin-subroute',
+            props: true,
+          },
+        ],
       },
     ],
   },

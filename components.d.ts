@@ -11,7 +11,11 @@ declare module 'vue' {
     ButtonComponent: typeof import('./src/components/button/ui/ButtonComponent.vue')['default']
     CardComponent: typeof import('./src/components/card/ui/CardComponent.vue')['default']
     FormComponent: typeof import('./src/components/form/ui/FormComponent.vue')['default']
+    ModalComponent: typeof import('./src/components/modal/ui/ModalComponent.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TableBodyComponent: typeof import('./src/components/table/ui/TableBodyComponent.vue')['default']
+    TableHeadComponent: typeof import('./src/components/table/ui/TableHeadComponent.vue')['default']
+    TableRowComponent: typeof import('./src/components/table/ui/TableRowComponent.vue')['default']
   }
 }

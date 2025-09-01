@@ -8,7 +8,7 @@ import {
 
 import { toMethodKeys } from '../../utils'
 
-export class ChatGPTController extends IHttpClient {
+export class ChatgptController extends IHttpClient {
   constructor() {
     super({
       url: '/chatgpt/api/v1',
@@ -22,5 +22,9 @@ export class ChatGPTController extends IHttpClient {
   public applications = this.requestMethods<ApplicationChatGPT>(
     '/applications',
     toMethodKeys(writeMethods),
+  )
+  public styles = this.requestMethods<ApplicationChatGPT>(
+    '/styles',
+    toMethodKeys(fullMethods),
   )
 }

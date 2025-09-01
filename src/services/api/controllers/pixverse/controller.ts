@@ -11,9 +11,10 @@ import {
 import { toMethodKeys } from '../../utils'
 
 export class PixverseController extends IHttpClient {
-  constructor() {
+  constructor(config?: { headers?: Record<string, string> }) {
     super({
       url: '/pixverse/api/v1',
+      headers: config?.headers,
     })
   }
 
@@ -31,6 +32,6 @@ export class PixverseController extends IHttpClient {
   )
   public applications = this.requestMethods<ApplicationPixverse>(
     '/applications',
-    toMethodKeys(writeMethods),
+    toMethodKeys(fullMethods),
   )
 }
