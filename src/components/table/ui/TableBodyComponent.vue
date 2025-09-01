@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { defineProps } from 'vue'
-
+import { defineProps, defineEmits } from 'vue'
 import TableRowComponent from './TableRowComponent.vue'
 
 interface TableRowType {
@@ -11,6 +10,11 @@ defineProps<{
   data: TableRowType[]
   headers: string[]
 }>()
+
+const emit = defineEmits<{
+  (e: 'edit', row: TableRowType): void
+  (e: 'delete', row: TableRowType): void
+}>()
 </script>
 
 <template>
@@ -20,6 +24,8 @@ defineProps<{
       :key="rowIndex"
       :row="row"
       :headers="headers"
+      @edit="emit('edit', $event)"
+      @delete="emit('delete', $event)"
     />
   </tbody>
 </template>

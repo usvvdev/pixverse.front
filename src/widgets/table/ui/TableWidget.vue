@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, defineProps } from 'vue'
+import { ref, computed, defineProps } from 'vue'
 import { TableBodyComponent, TableHeadComponent } from '@/components/table'
+import ModalComponent from '@/components/modal/ui/ModalComponent.vue'
 
 interface TableRow {
-  [key: string]: string
+  [key: string]: string | number | boolean
 }
 
 const props = defineProps<{
@@ -17,6 +18,20 @@ const headers = computed(() => {
     (key) => !props.exclude?.includes(key),
   )
 })
+
+// --- Модалка ---
+const modalOpen = ref(false)
+const selectedRow = ref<TableRow | null>(null)
+
+function handleEdit(row: TableRow) {
+  selectedRow.value = row
+  modalOpen.value = true
+}
+
+function handleDelete(row: TableRow) {
+  console.log('Удаляем:', row)
+  // здесь можно вызвать API или emit наверх
+}
 </script>
 
 <template>
@@ -31,10 +46,23 @@ const headers = computed(() => {
 
       <div class="table__scroll">
         <table class="table__body">
-          <TableBodyComponent :data="data" :headers="headers" />
+          <TableBodyComponent
+            :data="data"
+            :headers="headers"
+            @edit="handleEdit"
+            @delete="handleDelete"
+          />
         </table>
       </div>
     </div>
+
+    <ModalComponent
+      :visible="modalOpen"
+      :headers="headers"
+      :row="selectedRow || undefined"
+      @close="modalOpen = false"
+      @save="(updatedRow) => console.log('Сохраняем:', updatedRow)"
+    />
   </div>
 </template>
 
