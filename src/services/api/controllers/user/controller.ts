@@ -1,5 +1,5 @@
 import { IHttpClient } from '../core'
-import { HttpMethods, UserServices, UserRoutes } from '../../types'
+import { HttpMethods, UserServices, UserRoutes, UserToken } from '../../types'
 
 import { toMethodKeys } from '../../utils'
 
@@ -15,6 +15,11 @@ export class UserController extends IHttpClient {
     '/services',
     toMethodKeys([HttpMethods.GET]),
   ) as { get: () => Promise<UserServices> }
+
+  public info = this.requestMethods<UserToken>(
+    '/info',
+    toMethodKeys([HttpMethods.GET]),
+  ) as { get: () => Promise<UserToken> }
 
   public routes(title: string) {
     return this.requestMethods<UserRoutes>(

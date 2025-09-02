@@ -15,12 +15,18 @@ const routes = [
         component: defineAsyncComponent(() => import('@/pages/service')),
         meta: { requiresAuth: true },
       },
-      // {
-      //   path: '/applications',
-      //   name: 'applications',
-      //   component: defineAsyncComponent(() => import('@/pages/application')),
-      //   meta: { requiresAuth: true },
-      // },
+      {
+        path: '/applications',
+        name: 'applications',
+        component: defineAsyncComponent(() => import('@/pages/application')),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: '/customers',
+        name: 'customers',
+        component: defineAsyncComponent(() => import('@/pages/customer')),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
       {
         path: '/admin/:title',
         name: 'admin',

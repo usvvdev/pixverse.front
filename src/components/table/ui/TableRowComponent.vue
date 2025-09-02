@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, defineProps, defineEmits, onMounted, nextTick } from 'vue'
+import { useRoute } from 'vue-router'
 import ButtonComponent from '@/components/button/ui/ButtonComponent.vue'
 import { DeleteIcon, EditIcon } from '@/app/assets/icons'
 
@@ -26,6 +27,9 @@ function getSafeId(url: string) {
   return `${btoa(url)}`
 }
 
+const route = useRoute()
+const title = route.params.title
+
 const mediaCache = ref<{ [key: string]: string }>({})
 const loadedMediaSet = new Set<string>()
 
@@ -35,8 +39,8 @@ async function loadMedia(url: string) {
   try {
     // Используем относительный путь через прокси
     const path = url.replace(
-      'https://trust.coreapis.space/pixverse',
-      '/pixverse',
+      `https://trust.coreapis.space/${title}`,
+      `/${title}`,
     )
 
     const res = await fetch(path)

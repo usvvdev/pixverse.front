@@ -4,7 +4,7 @@ import LinkIcon from '@/app/assets/icons/LinkIcon.vue'
 defineProps<{
   title: string
   tag?: string
-  isDocs?: boolean
+  isAdmin?: Boolean
   href?: string
   className?: string
 }>()
@@ -17,9 +17,10 @@ const appUrl = import.meta.env.VITE_APP_URL
     <div class="base__card-header">
       <h3 class="base__card-header__title">{{ title }}</h3>
       <a
-        v-if="isDocs"
+        v-if="isAdmin"
         class="base__card-header__tag"
         :href="`${appUrl}/${title}/docs`"
+        target="_blank"
       >
         {{ tag }}
       </a>

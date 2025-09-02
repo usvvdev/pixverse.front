@@ -37,6 +37,11 @@
         border-color: $dark-blue;
         background: #f9fbff;
       }
+
+      &--error {
+        border: 1px solid $red;
+        background-color: $pink;
+      }
     }
 
     @media (max-width: 600px) {

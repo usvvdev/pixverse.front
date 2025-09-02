@@ -144,13 +144,13 @@
       border-radius: 12px;
 
       &--active {
-        background-color: #e8f5e8;
-        color: #2e7d32;
+        background-color: $light-green;
+        color: $green;
       }
 
       &--inactive {
-        background-color: #ffebee;
-        color: #c62828;
+        background-color: $pink;
+        color: $red;
       }
 
       @media (max-width: 600px) {

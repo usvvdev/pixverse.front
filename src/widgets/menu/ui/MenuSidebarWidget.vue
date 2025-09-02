@@ -17,6 +17,7 @@ import {
   AccountIcon,
   TemplateIcon,
   StyleIcon,
+  UserIcon,
 } from '@/app/assets/icons'
 
 // динамические хуки
@@ -33,7 +34,7 @@ interface SidebarItem {
   logout: NavigationItem[]
 }
 
-const props = defineProps<{ title?: string }>()
+const props = defineProps<{ title?: string; isAdmin?: boolean }>()
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -68,7 +69,8 @@ watchEffect(async () => {
     sidebarItems.value = {
       navigation: [
         { href: '/services', icon: HomeIcon },
-        // { href: '/applications', icon: ApplicationIcon },
+        { href: '/applications', icon: ApplicationIcon },
+        ...(props.isAdmin ? [{ href: '/customers', icon: UserIcon }] : []),
       ],
       logout: [{ icon: LogoutIcon, onClick: logout }],
     }

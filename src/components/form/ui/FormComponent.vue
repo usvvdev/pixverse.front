@@ -6,6 +6,7 @@ defineProps<{
   type: string
   id: string
   modelValue: string
+  hasError?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -23,7 +24,7 @@ defineExpose({ inputRef })
     <label :for="id">{{ name }}</label>
     <input
       ref="inputRef"
-      class="form__group-input"
+      :class="['form__group-input', { 'form__group-input--error': hasError }]"
       :type="type"
       :id="id"
       :value="modelValue"

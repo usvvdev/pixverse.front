@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import MainLayout from '@/app/layouts/main/ui/MainLayout.vue'
@@ -18,14 +18,26 @@ const formData = reactive<AuthUserCredentials>({
   password: '',
 })
 
+const error = ref<string | null>(null)
+
 const authUser = async () => {
   try {
     const response = await controller.auth({ ...formData })
+
     if (response?.access_token) {
       await router.push('/services')
+    } else if (response?.detail) {
+      error.value = response.detail
+      for (const key in formData) {
+        formData[key as keyof AuthUserCredentials] = ''
+      }
     }
-  } catch (err) {
+  } catch (err: { message: string }) {
     console.error('Authorization error: ', err)
+    error.value = err?.message || 'Network error'
+    for (const key in formData) {
+      formData[key as keyof AuthUserCredentials] = ''
+    }
   }
 }
 
@@ -51,7 +63,13 @@ const authFormItems = [
           :type="item.type"
           :id="item.id"
           v-model="formData[item.key]"
+          :has-error="!!error"
+          @input="error = null"
         />
+
+        <div v-if="error" class="auth__card-error">
+          {{ error }}
+        </div>
 
         <ButtonComponent :icon="LinkIcon" type="submit" />
       </form>

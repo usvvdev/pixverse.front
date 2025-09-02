@@ -15,6 +15,12 @@ const controller = new UserController({
   },
 })
 
+const isAdmin = useController(
+  controller,
+  (c) => c.info.get().then((res) => res.role === 'admin'),
+  'is_admin',
+)
+
 const services = useController(
   controller,
   (c) => c.services.get().then((res) => res.items),
@@ -25,7 +31,7 @@ const services = useController(
 <template>
   <MainLayout>
     <template #sidebar>
-      <MenuSidebarWidget />
+      <MenuSidebarWidget :isAdmin="isAdmin" />
     </template>
 
     <template #content>
@@ -33,7 +39,7 @@ const services = useController(
         <CardComponent
           v-for="service in services"
           :key="service.id"
-          :isDocs="true"
+          :isAdmin="isAdmin"
           tag="docs"
           :title="service.title"
           :href="`/admin/${service.title}`"

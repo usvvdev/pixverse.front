@@ -6,24 +6,22 @@ const isAdminData = localStorage.getItem('is_admin')
 
 const isAdmin = isAdminData ? JSON.parse(isAdminData) : false
 
-// import CardComponent from '@/components/card/ui/CardComponent.vue'
-
-// import { DashboardController } from '@/services/api/controllers/dashboard/controller'
+// import { UserController } from '@/services/api/controllers/user/controller'
 // import { useController } from '@/services/composables/apiRetry'
 
 // const token = localStorage.getItem('access_token')
 // const tokenType = localStorage.getItem('token_type')
 
-// const controller = new DashboardController({
+// const controller = new UserController({
 //   headers: {
 //     Authorization: `${tokenType} ${token}`,
 //   },
 // })
 
-// const applications = useController(
+// const isAdmin = useController(
 //   controller,
-//   (c) => c.applications.get(),
-//   'applications',
+//   (c) => c.info.get().then((res) => res.role === 'admin'),
+//   'is_admin',
 // )
 </script>
 
@@ -33,7 +31,7 @@ const isAdmin = isAdminData ? JSON.parse(isAdminData) : false
       <MenuSidebarWidget :is-admin="isAdmin" />
     </template>
 
-    <template #content> </template>
+    <template #content></template>
   </MainLayout>
 </template>
 
