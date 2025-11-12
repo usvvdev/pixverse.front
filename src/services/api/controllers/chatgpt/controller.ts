@@ -1,10 +1,5 @@
 import { IHttpClient } from '../core'
-import {
-  TemplateChatGPT,
-  ApplicationChatGPT,
-  fullMethods,
-  writeMethods,
-} from '../../types'
+import { TemplateChatGPT, ApplicationChatGPT, fullMethods } from '../../types'
 
 import { toMethodKeys } from '../../utils'
 
@@ -21,10 +16,6 @@ export class ChatgptController extends IHttpClient {
   )
   public applications = this.requestMethods<ApplicationChatGPT>(
     '/applications',
-    toMethodKeys(writeMethods),
-  )
-  public styles = this.requestMethods<ApplicationChatGPT>(
-    '/styles',
     toMethodKeys(fullMethods),
   )
 }
