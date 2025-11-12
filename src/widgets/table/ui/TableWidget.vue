@@ -32,6 +32,11 @@ function handleDelete(row: TableRow) {
   console.log('Удаляем:', row)
   // здесь можно вызвать API или emit наверх
 }
+
+const fullImage = ref<string | null>(null)
+function openFull(src: string) {
+  fullImage.value = src
+}
 </script>
 
 <template>
@@ -51,8 +56,16 @@ function handleDelete(row: TableRow) {
             :headers="headers"
             @edit="handleEdit"
             @delete="handleDelete"
+            @open-full="openFull"
           />
         </table>
+        <div
+          v-if="fullImage"
+          class="fullscreen__overlay"
+          @click="fullImage = null"
+        >
+          <img :src="fullImage" class="fullscreen__image" />
+        </div>
       </div>
     </div>
 

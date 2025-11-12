@@ -7,23 +7,38 @@ import Icons from 'unplugin-icons/vite'
 import Components from 'unplugin-vue-components/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(async ({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const APP_URL: string = env.VITE_APP_URL
+  const EXTRA_URL: string = env.VITE_EXTRA_URL
   const PROXY_PATHS: string[] = JSON.parse(env.VITE_API_PATHS)
 
-  const proxyConfig = Object.fromEntries(
-    PROXY_PATHS.map((p) => [
-      `/${p}`,
-      {
-        target: `${APP_URL}/${p}/`,
-        changeOrigin: true,
-        secure: false,
-        ws: true,
-        rewrite: (path) => path.replace(new RegExp(`^/${p}`), `/${p}`),
-      },
-    ]),
-  )
+  const extraProxy = {
+    '/assets': {
+      target: EXTRA_URL,
+      changeOrigin: true,
+    },
+    '/v1': {
+      target: EXTRA_URL,
+      changeOrigin: true,
+    },
+  }
+
+  const proxyConfig = {
+    ...Object.fromEntries(
+      PROXY_PATHS.map((p) => [
+        `/${p}`,
+        {
+          target: `${APP_URL}/${p}/`,
+          changeOrigin: true,
+          secure: false,
+          ws: true,
+          rewrite: (path) => path.replace(new RegExp(`^/${p}`), `/${p}`),
+        },
+      ]),
+    ),
+    ...extraProxy,
+  }
 
   return {
     plugins: [
@@ -49,9 +64,6 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       proxy: proxyConfig,
-      // host: true,
-      // port: 5173,
-      // strictPort: false,
     },
   }
 })

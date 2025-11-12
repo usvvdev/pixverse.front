@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref, defineProps, defineEmits, onMounted, nextTick } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, defineProps, defineEmits, nextTick, watch } from 'vue'
 import ButtonComponent from '@/components/button/ui/ButtonComponent.vue'
 import { DeleteIcon, EditIcon } from '@/app/assets/icons'
 
@@ -8,111 +7,96 @@ interface TableRowType {
   [key: string]: string
 }
 
-const props = defineProps<{
-  row: TableRowType
-  headers: string[]
-}>()
-
+const props = defineProps<{ row: TableRowType; headers: string[] }>()
 const emit = defineEmits<{
   (e: 'edit', row: TableRowType): void
   (e: 'delete', row: TableRowType): void
+  (e: 'open-full', url: string): void
 }>()
+
+const mediaCache = ref<Record<string, string>>({})
+const loaded = new Set<string>()
 
 const actions = [
   { id: 1, icon: EditIcon, handler: () => emit('edit', props.row) },
   { id: 2, icon: DeleteIcon, handler: () => emit('delete', props.row) },
 ]
 
-function getSafeId(url: string) {
-  return `${btoa(url)}`
-}
+const getSafeId = (url: string) => btoa(url)
+const getLocalPath = (url: string) => url.replace(/^https?:\/\/[^/]+/, '')
 
-const route = useRoute()
-const title = route.params.title
+const loading = new Map<string, Promise<string>>()
 
-const mediaCache = ref<{ [key: string]: string }>({})
-const loadedMediaSet = new Set<string>()
-
-async function loadMedia(url: string) {
+const loadMedia = async (url: string) => {
+  if (!url) return ''
   if (mediaCache.value[url]) return mediaCache.value[url]
+  if (loading.has(url)) return await loading.get(url)!
 
-  try {
-    // Используем относительный путь через прокси
-    const path = url.replace(
-      `https://trust.coreapis.space/${title}`,
-      `/${title}`,
-    )
+  const promise = (async () => {
+    try {
+      const res = await fetch(getLocalPath(url))
+      if (!res.ok) throw new Error(res.statusText)
 
-    const res = await fetch(path)
-    if (!res.ok) throw new Error(`Ошибка загрузки: ${res.status}`)
+      const blob = await res.blob()
+      const objectUrl = URL.createObjectURL(blob)
 
-    const blob = await res.blob()
-    const reader = new FileReader()
+      mediaCache.value[url] = objectUrl
+      loading.delete(url)
 
-    return new Promise<string>((resolve) => {
-      reader.onloadend = () => {
-        const base64data = reader.result as string
-        mediaCache.value[url] = base64data
-        resolve(base64data)
-      }
-      reader.readAsDataURL(blob)
-    })
-  } catch (err) {
-    console.error('Не удалось загрузить медиа:', url, err)
-    return ''
-  }
+      return objectUrl
+    } catch (e) {
+      console.error('Ошибка загрузки:', url, e)
+      loading.delete(url)
+      return ''
+    }
+  })()
+
+  loading.set(url, promise)
+  return await promise
 }
 
-async function observeMedia(
-  el: HTMLMediaElement | HTMLImageElement,
-  url: string,
-) {
-  if (!el || loadedMediaSet.has(url)) return
-
+const observeMedia = (el: HTMLMediaElement | HTMLImageElement, url: string) => {
+  if (!el || loaded.has(url) || mediaCache.value[url]) return
   const observer = new IntersectionObserver(
-    async (entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          if (!el.src) {
-            const src = await loadMedia(url)
-            if (src) el.src = src
-            loadedMediaSet.add(url)
-          }
-          observer.disconnect()
-        }
+    async ([entry]) => {
+      if (entry.isIntersecting) {
+        el.src ||= await loadMedia(url)
+        loaded.add(url)
+        observer.disconnect()
       }
     },
     { threshold: 0.1 },
   )
-
   observer.observe(el)
 }
-onMounted(() => {
-  nextTick(() => {
-    props.headers.forEach((header) => {
-      if (header === 'preview_large' && props.row[header]) {
-        const url = props.row[header]
-        const el = document.getElementById(getSafeId(url)) as
-          | HTMLMediaElement
-          | HTMLImageElement
-        if (el) {
-          if (mediaCache.value[url]) {
-            el.src = mediaCache.value[url]
-          } else {
-            observeMedia(el, url)
-          }
-        }
-      }
-    })
-  })
-})
+
+watch(
+  () => props.row,
+  async () => {
+    await nextTick()
+    const url = props.row['preview_large']
+    if (!url) return
+    const el = document.getElementById(getSafeId(url)) as
+      | HTMLMediaElement
+      | HTMLImageElement
+    if (!el) return
+    if (mediaCache.value[url]) {
+      el.src = mediaCache.value[url]
+    }
+    if (loaded.has(url)) return
+    else {
+      observeMedia(el, url)
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
   <tr class="table__row table__row--body">
     <td
       v-for="header in headers"
-      :key="header"
+      :key="`${props.row.id || props.row.preview_large}-${header}`"
       class="table__cell table__cell--body"
     >
       <template v-if="header === 'is_active'">
@@ -129,21 +113,23 @@ onMounted(() => {
 
       <template v-else-if="header === 'preview_large'">
         <div class="table__preview-wrapper">
-          <template v-if="row[header]?.endsWith('.mp4')">
-            <video
+          <template v-if="row[header]">
+            <component
+              :is="row[header].endsWith('.mp4') ? 'video' : 'img'"
               class="table__preview"
               :id="getSafeId(row[header])"
-              controls
-              preload="metadata"
+              v-bind="
+                row[header].endsWith('.mp4')
+                  ? { controls: true, preload: 'metadata' }
+                  : {
+                      alt: 'preview',
+                      onClick: () => emit('open-full', row[header]),
+                    }
+              "
             />
           </template>
-          <template v-else>
-            <img
-              class="table__preview"
-              :id="getSafeId(row[header])"
-              alt="preview"
-            />
-          </template>
+
+          <div v-else class="table__preview-mock"></div>
         </div>
       </template>
 

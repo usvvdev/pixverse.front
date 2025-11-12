@@ -14,6 +14,7 @@ defineProps<{
 const emit = defineEmits<{
   (e: 'edit', row: TableRowType): void
   (e: 'delete', row: TableRowType): void
+  (e: 'open-full', url: string): void
 }>()
 </script>
 
@@ -26,6 +27,7 @@ const emit = defineEmits<{
       :headers="headers"
       @edit="emit('edit', $event)"
       @delete="emit('delete', $event)"
+      @open-full="emit('open-full', $event)"
     />
   </tbody>
 </template>

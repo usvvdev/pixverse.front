@@ -18,7 +18,7 @@
     &--head {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 16px;
+      gap: 18px;
 
       @media (max-width: 600px) {
         grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
@@ -34,7 +34,7 @@
     &--body {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 16px;
+      gap: 18px;
       transition: background-color 0.2s ease;
       border-bottom: 1px solid $light-gray;
 
@@ -55,7 +55,7 @@
   }
 
   &__cell {
-    padding: 16px;
+    padding: 18px;
     text-align: left;
 
     &--head {
@@ -83,7 +83,7 @@
       justify-content: start;
       font-size: 14px;
       color: $dark-gray;
-      padding: 16px;
+      padding: 18px;
 
       @media (max-width: 600px) {
         font-size: 12px;
@@ -123,6 +123,9 @@
     }
 
     &-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       margin: 0;
       white-space: nowrap;
       overflow: hidden;
@@ -169,11 +172,27 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: top;
     border-radius: 12px;
 
+    &:fullscreen {
+      object-fit: contain;
+    }
+
+    &-wrapper,
+    &-mock {
+      width: 150px;
+      height: 195px;
+      border-radius: 12px;
+    }
+
     &-wrapper {
-      width: 200px;
-      height: 150px;
+      cursor: pointer;
+    }
+
+    &-mock {
+      cursor: not-allowed;
+      background-color: $light-gray;
     }
   }
 }

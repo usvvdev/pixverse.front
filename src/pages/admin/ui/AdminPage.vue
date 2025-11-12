@@ -42,7 +42,14 @@ watchEffect(() => {
       <div class="wrapper__admin">
         <TableWidget
           :data="data?.value"
-          :exclude="['id', 'prompt', 'template_id', 'preview_small']"
+          :exclude="[
+            'id',
+            'prompt',
+            'template_id',
+            'preview_small',
+            // 'templates',
+            // 'styles',
+          ]"
         />
       </div>
     </template>
