@@ -69,8 +69,8 @@ watchEffect(async () => {
     sidebarItems.value = {
       navigation: [
         { href: '/services', icon: HomeIcon },
-        { href: '/applications', icon: ApplicationIcon },
-        ...(props.isAdmin ? [{ href: '/customers', icon: UserIcon }] : []),
+        // { href: '/applications', icon: ApplicationIcon },
+        // ...(props.isAdmin ? [{ href: '/customers', icon: UserIcon }] : []),
       ],
       logout: [{ icon: LogoutIcon, onClick: logout }],
     }
