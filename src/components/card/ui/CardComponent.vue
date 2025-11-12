@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ButtonComponent from '@/components/button/ui/ButtonComponent.vue'
 import LinkIcon from '@/app/assets/icons/LinkIcon.vue'
+
 defineProps<{
   title: string
   tag?: string

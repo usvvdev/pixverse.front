@@ -2,18 +2,16 @@
 import { defineProps, defineEmits } from 'vue'
 import TableRowComponent from './TableRowComponent.vue'
 
-interface TableRowType {
-  [key: string]: string
-}
+import { TableRowItem } from '@/shared/types/interface'
 
 defineProps<{
-  data: TableRowType[]
+  data: TableRowItem[]
   headers: string[]
 }>()
 
 const emit = defineEmits<{
-  (e: 'edit', row: TableRowType): void
-  (e: 'delete', row: TableRowType): void
+  (e: 'edit', row: TableRowItem): void
+  (e: 'delete', row: TableRowItem): void
   (e: 'open-full', url: string): void
 }>()
 </script>

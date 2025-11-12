@@ -3,12 +3,10 @@ import { ref, computed, defineProps } from 'vue'
 import { TableBodyComponent, TableHeadComponent } from '@/components/table'
 import ModalComponent from '@/components/modal/ui/ModalComponent.vue'
 
-interface TableRow {
-  [key: string]: string | number | boolean
-}
+import { TableRowItem } from '@/shared/types/interface'
 
 const props = defineProps<{
-  data: TableRow[]
+  data: TableRowItem[]
   exclude?: string[]
 }>()
 
@@ -21,14 +19,14 @@ const headers = computed(() => {
 
 // --- Модалка ---
 const modalOpen = ref(false)
-const selectedRow = ref<TableRow | null>(null)
+const selectedRow = ref<TableRowItem | null>(null)
 
-function handleEdit(row: TableRow) {
+function handleEdit(row: TableRowItem) {
   selectedRow.value = row
   modalOpen.value = true
 }
 
-function handleDelete(row: TableRow) {
+function handleDelete(row: TableRowItem) {
   console.log('Удаляем:', row)
   // здесь можно вызвать API или emit наверх
 }

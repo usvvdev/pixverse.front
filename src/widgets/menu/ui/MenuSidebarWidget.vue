@@ -17,7 +17,6 @@ import {
   AccountIcon,
   TemplateIcon,
   StyleIcon,
-  UserIcon,
 } from '@/app/assets/icons'
 
 // динамические хуки
@@ -111,7 +110,7 @@ watchEffect(async () => {
         }
       })
     } catch (e) {
-      console.error('Ошибка при инициализации навигации:', e)
+      console.error('Error an occurred while inizializating routes:', e)
     }
   }
 })

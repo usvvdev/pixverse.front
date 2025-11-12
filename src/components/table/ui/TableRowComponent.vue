@@ -3,14 +3,13 @@ import { ref, defineProps, defineEmits, nextTick, watch } from 'vue'
 import ButtonComponent from '@/components/button/ui/ButtonComponent.vue'
 import { DeleteIcon, EditIcon } from '@/app/assets/icons'
 
-interface TableRowType {
-  [key: string]: string
-}
+import { TableRowItem } from '@/shared/types/interface'
 
-const props = defineProps<{ row: TableRowType; headers: string[] }>()
+const props = defineProps<{ row: TableRowItem; headers: string[] }>()
+
 const emit = defineEmits<{
-  (e: 'edit', row: TableRowType): void
-  (e: 'delete', row: TableRowType): void
+  (e: 'edit', row: TableRowItem): void
+  (e: 'delete', row: TableRowItem): void
   (e: 'open-full', url: string): void
 }>()
 
@@ -45,7 +44,7 @@ const loadMedia = async (url: string) => {
 
       return objectUrl
     } catch (e) {
-      console.error('Ошибка загрузки:', url, e)
+      console.error('Loading error:', url, e)
       loading.delete(url)
       return ''
     }
@@ -131,6 +130,10 @@ watch(
 
           <div v-else class="table__preview-mock"></div>
         </div>
+      </template>
+
+      <template v-else-if="['templates', 'styles'].includes(header)">
+        <p class="table__cell-text">{{ row[header]?.length || 0 }}</p>
       </template>
 
       <template v-else>
