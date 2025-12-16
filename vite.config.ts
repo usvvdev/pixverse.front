@@ -31,10 +31,14 @@ export default defineConfig(async ({ mode }) => {
     '/admin_tts': {
       target: 'https://files.topmediai.com',
       changeOrigin: true,
+      secure: false,
+      ws: true,
     },
     '/tts': {
       target: 'https://files.topmediai.com',
       changeOrigin: true,
+      secure: false,
+      ws: true,
     },
   }
 
