@@ -39,7 +39,6 @@ export abstract class IHttpClient {
     query?: Record<string, string | unknown>,
   ): Promise<T> {
     const queryString = this.buildQueryString(query)
-
     const response = await fetch(`${this.url}${endpoint}${queryString}`, {
       method,
       headers: this.headers,

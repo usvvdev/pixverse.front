@@ -47,6 +47,7 @@ watchEffect(() => {
             'prompt',
             'template_id',
             'preview_small',
+            'avatar_url',
             // 'templates',
             // 'styles',
           ]"

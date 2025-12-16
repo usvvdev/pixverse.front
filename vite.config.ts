@@ -22,6 +22,20 @@ export default defineConfig(async ({ mode }) => {
       target: EXTRA_URL,
       changeOrigin: true,
     },
+    '/topmedia': {
+      target: 'http://96.9.225.42:8000',
+      changeOrigin: true,
+      secure: false,
+      ws: true,
+    },
+    '/admin_tts': {
+      target: 'https://files.topmediai.com',
+      changeOrigin: true,
+    },
+    '/tts': {
+      target: 'https://files.topmediai.com',
+      changeOrigin: true,
+    },
   }
 
   const proxyConfig = {

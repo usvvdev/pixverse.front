@@ -54,6 +54,18 @@ const loadMedia = async (url: string) => {
   return await promise
 }
 
+const loadAudio = async (url: string, el: HTMLAudioElement) => {
+  if (!url || mediaCache.value[url]) {
+    if (mediaCache.value[url]) el.src = mediaCache.value[url]
+    return
+  }
+
+  const src = await loadMedia(url)
+  if (src) {
+    el.src = src
+  }
+}
+
 const observeMedia = (el: HTMLMediaElement | HTMLImageElement, url: string) => {
   if (!el || loaded.has(url) || mediaCache.value[url]) return
   const observer = new IntersectionObserver(
@@ -73,18 +85,31 @@ watch(
   () => props.row,
   async () => {
     await nextTick()
-    const url = props.row['preview_large']
-    if (!url) return
-    const el = document.getElementById(getSafeId(url)) as
-      | HTMLMediaElement
-      | HTMLImageElement
-    if (!el) return
-    if (mediaCache.value[url]) {
-      el.src = mediaCache.value[url]
+
+    const mediaUrls = [
+      props.row.preview_large,
+      props.row.avatar_url_webp,
+    ].filter(Boolean) as string[]
+
+    for (const url of mediaUrls) {
+      const el = document.getElementById(getSafeId(url)) as
+        | HTMLImageElement
+        | HTMLVideoElement
+
+      if (!el) continue
+
+      if (mediaCache.value[url]) el.src = mediaCache.value[url]
+      if (!loaded.has(url)) observeMedia(el, url)
     }
-    if (loaded.has(url)) return
-    else {
-      observeMedia(el, url)
+
+    if (props.row.audition_url) {
+      const audioEl = document.getElementById(
+        getSafeId(props.row.audition_url),
+      ) as HTMLAudioElement
+
+      if (audioEl) {
+        await loadAudio(props.row.audition_url, audioEl)
+      }
     }
   },
   { immediate: true },
@@ -110,7 +135,9 @@ watch(
         </span>
       </template>
 
-      <template v-else-if="header === 'preview_large'">
+      <template
+        v-else-if="['preview_large', 'avatar_url_webp'].includes(header)"
+      >
         <div class="table__preview-wrapper">
           <template v-if="row[header]">
             <component
@@ -125,6 +152,21 @@ watch(
                       onClick: () => emit('open-full', row[header]),
                     }
               "
+            />
+          </template>
+
+          <div v-else class="table__preview-mock"></div>
+        </div>
+      </template>
+
+      <template v-else-if="header === 'audition_url'">
+        <div class="table__audio-wrapper">
+          <template v-if="row.audition_url">
+            <audio
+              class="table__audio"
+              controls
+              preload="metadata"
+              :id="getSafeId(row.audition_url)"
             />
           </template>
 

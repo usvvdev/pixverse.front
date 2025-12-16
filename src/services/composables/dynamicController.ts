@@ -19,6 +19,8 @@ export async function useDynamicController(title: string) {
   const ControllerClass =
     module.default || module[`${capitalize(title)}Controller`]
 
+  console.log(ControllerClass)
+
   return new ControllerClass({
     headers: {
       Authorization: `${tokenType} ${token}`,
